@@ -26,7 +26,7 @@ class RateUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'nullable|string',
+            'name' => 'nullable|string',
             'rate' => 'nullable|numeric',
             'launch_info' => 'nullable|array',
         ];
