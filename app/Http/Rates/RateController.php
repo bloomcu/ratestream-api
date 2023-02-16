@@ -20,11 +20,27 @@ class RateController extends Controller
 {
     public function index(Organization $organization)
     {
+        // Render rates nested into groups from api
+        // -----
+        $rates = $organization->rates;
+        $groups = $rates->pluck('group')->unique()->flatten();
+        foreach ($groups as $group) {
+            $group->rates = array_filter($rates->toArray(), function ($rate) use ($group) {
+                return $rate['group']['title'] === $group->title;
+            });
+        }
+        return $groups;
+
+        // Render rates using filter in store
+        // -----
         // $rates = $organization->rates;
-        $rates = $organization->rates->groupBy('group');
+        // $groups = $rates->pluck('group')->unique()->flatten();
+        // return [
+        //     'rates' => RateResource::collection($rates),
+        //     'groups' => $groups
+        // ];
 
         // return RateResource::collection($rates);
-        return $rates;
     }
 
     public function store(Organization $organization, RateStoreRequest $request)

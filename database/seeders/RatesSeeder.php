@@ -19,19 +19,19 @@ class RatesSeeder extends Seeder
         $rates = [
             // Unsecured
             [
-                'group' => 'Unsecured',
+                'rate_group_id' => 1,
                 'name' => 'Unsecured - 36',
                 'term' => 36,
                 'rate' => 8.74,
             ],
             [
-                'group' => 'Unsecured',
+                'rate_group_id' => 1,
                 'name' => 'Unsecured - 48',
                 'term' => 48,
                 'rate' => 9.74,
             ],
             [
-                'group' => 'Unsecured',
+                'rate_group_id' => 1,
                 'name' => 'Unsecured - 60',
                 'term' => 60,
                 'rate' => 10.74,
@@ -39,7 +39,7 @@ class RatesSeeder extends Seeder
 
             // New Auto Loan
             [
-                'group' => 'New Auto Loan',
+                'rate_group_id' => 2,
                 'name' => 'New Auto Loan - 36',
                 'year_low' => '2021',
                 'year_high' => '2023',
@@ -47,7 +47,7 @@ class RatesSeeder extends Seeder
                 'rate' => 5.49,
             ],
             [
-                'group' => 'New Auto Loan',
+                'rate_group_id' => 2,
                 'name' => 'New Auto Loan - 48',
                 'year_low' => '2021',
                 'year_high' => '2023',
@@ -55,7 +55,7 @@ class RatesSeeder extends Seeder
                 'rate' => 5.74,
             ],
             [
-                'group' => 'New Auto Loan',
+                'rate_group_id' => 2,
                 'name' => 'New Auto Loan - 66',
                 'year_low' => '2021',
                 'year_high' => '2023',
@@ -65,13 +65,13 @@ class RatesSeeder extends Seeder
 
             // Classic Car
             [
-                'group' => 'Classic Car',
+                'rate_group_id' => 3,
                 'name' => 'Classic Car - 36',
                 'term' => 36,
                 'rate' => 8.64,
             ],
             [
-                'group' => 'Classic Car',
+                'rate_group_id' => 3,
                 'name' => 'Classic Car - 48',
                 'term' => 48,
                 'rate' => 9.64,

@@ -15,4 +15,14 @@ class Organization extends BaseOrganization {
     {
         return $this->hasMany('DDD\Domain\Rates\Rate');
     }
+
+    /**
+     * Rate groups associated with the organization.
+     *
+     * @return hasMany
+     */
+    public function groups()
+    {
+        return $this->hasMany('DDD\Domain\Rates\RateGroup');
+    }
 }

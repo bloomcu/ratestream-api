@@ -5,14 +5,11 @@ namespace DDD\Domain\Rates;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-// Casts
-use DDD\Domain\Rates\Casts\CustomFields;
-
 // Traits
 use DDD\App\Traits\BelongsToOrganization;
 use DDD\App\Traits\BelongsToUser;
 
-class Rate extends Model
+class RateGroup extends Model
 {
     use HasFactory,
         BelongsToOrganization,
@@ -22,19 +19,13 @@ class Rate extends Model
         'id',
     ];
 
-    protected $with = ['group'];
-
-    protected $casts = [
-        'custom_fields' => CustomFields::class,
-    ];
-
     /**
-     * Rate group this model belongs to.
+     * Rates associated with the group.
      *
-     * @return belongsTo
+     * @return hasMany
      */
-    public function group()
+    public function rates()
     {
-        return $this->belongsTo('DDD\Domain\Rates\RateGroup', 'rate_group_id');
+        return $this->hasMany('DDD\Domain\Rates\Rate');
     }
 }

@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             SubscriptionPlansSeeder::class,
             OrganizationsSeeder::class,
             UsersSeeder::class,
+            RateGroupsSeeder::class,
             RatesSeeder::class,
             // SitesSeeder::class,
             // TagsSeeder::class,

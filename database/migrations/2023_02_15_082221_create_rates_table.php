@@ -17,7 +17,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('organization_id');
             $table->foreignId('user_id');
-            $table->string('group')->default('No group');
+            $table->foreignId('rate_group_id');
+            // $table->string('group')->default('No group');
             $table->string('name')->unique()->nullable();
             $table->integer('year')->nullable();
                 $table->integer('year_low')->nullable();
@@ -34,6 +35,7 @@ return new class extends Migration
             // Foreign constraints
             $table->foreign('organization_id')->references('id')->on('organizations');
             $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('rate_group_id')->references('id')->on('rate_groups');
         });
     }
 
