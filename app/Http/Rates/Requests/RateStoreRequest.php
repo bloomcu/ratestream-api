@@ -28,7 +28,7 @@ class RateStoreRequest extends FormRequest
         return [
             'name' => 'nullable|string',
             'rate' => 'nullable|numeric',
-            'launch_info' => 'nullable|array',
+            'columns' => 'nullable|array',
         ];
     }
 

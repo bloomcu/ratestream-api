@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 // Casts
-use DDD\Domain\Rates\Casts\CustomFields;
+use DDD\Domain\Rates\Casts\RateColumns;
 
 // Traits
 use DDD\App\Traits\BelongsToOrganization;
@@ -25,7 +25,7 @@ class Rate extends Model
     protected $with = ['group'];
 
     protected $casts = [
-        'custom_fields' => CustomFields::class,
+        'columns' => RateColumns::class,
     ];
 
     /**

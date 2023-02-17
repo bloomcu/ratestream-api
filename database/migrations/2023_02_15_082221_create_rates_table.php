@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('organization_id');
             $table->foreignId('user_id');
-            $table->foreignId('rate_group_id');
+            $table->foreignId('rate_group_id')->nullable();
             // $table->string('group')->default('No group');
             $table->string('name')->unique()->nullable();
             $table->integer('year')->nullable();
@@ -29,7 +29,7 @@ return new class extends Migration
             $table->integer('term')->nullable();
                 // $table->integer('term_low')->nullable();
                 // $table->integer('term_high')->nullable();
-            $table->json('custom_fields')->nullable();
+            $table->json('columns')->nullable();
             $table->timestamps();
 
             // Foreign constraints

@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
             OrganizationsSeeder::class,
             UsersSeeder::class,
             RateGroupsSeeder::class,
-            RatesSeeder::class,
+            // RatesSeeder::class,
             // SitesSeeder::class,
             // TagsSeeder::class,
             // StatusesSeeder::class,

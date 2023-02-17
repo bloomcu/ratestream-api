@@ -22,23 +22,23 @@ class RateController extends Controller
     {
         // Render rates nested into groups from api
         // -----
-        $rates = $organization->rates;
-        $groups = $rates->pluck('group')->unique()->flatten();
-        foreach ($groups as $group) {
-            $group->rates = array_filter($rates->toArray(), function ($rate) use ($group) {
-                return $rate['group']['title'] === $group->title;
-            });
-        }
-        return $groups;
+        // $rates = $organization->rates;
+        // $groups = $rates->pluck('group')->unique()->flatten();
+        // foreach ($groups as $group) {
+        //     $group->rates = array_filter($rates->toArray(), function ($rate) use ($group) {
+        //         return $rate['group']['title'] === $group->title;
+        //     });
+        // }
+        // return $groups;
 
         // Render rates using filter in store
         // -----
-        // $rates = $organization->rates;
-        // $groups = $rates->pluck('group')->unique()->flatten();
-        // return [
-        //     'rates' => RateResource::collection($rates),
-        //     'groups' => $groups
-        // ];
+        $rates = $organization->rates;
+        $groups = $rates->pluck('group')->filter()->unique()->flatten();
+        return [
+            'rates' => RateResource::collection($rates),
+            'groups' => $groups
+        ];
 
         // return RateResource::collection($rates);
     }
@@ -61,8 +61,8 @@ class RateController extends Controller
     {
         $rate->update($request->validated());
 
-        // return new RateResource($rate);
-        return $rate;
+        return new RateResource($rate);
+        // return $rate;
     }
 
     public function destroy(Organization $organization, Rate $rate)

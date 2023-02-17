@@ -4,7 +4,7 @@ namespace DDD\Domain\Rates\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 
-class CustomFields implements CastsAttributes
+class RateColumns implements CastsAttributes
 {
     /**
      * Cast the given value.
