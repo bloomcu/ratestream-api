@@ -16,9 +16,9 @@ class RateResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'uid' => $this->uid,
             'group' => $this->whenLoaded('group', fn() => $this->group->title),
             // 'group' => $this->whenLoaded('group'),
-            'name' => $this->name,
             // 'rate' => $this->rate,
                 // 'rate_low' => $this->rate_low,
                 // 'rate_high' => $this->rate_high,

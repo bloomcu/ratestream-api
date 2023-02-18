@@ -17,18 +17,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('organization_id');
             $table->foreignId('user_id');
+            $table->string('uid')->unique()->nullable();
             $table->foreignId('rate_group_id')->nullable();
-            // $table->string('group')->default('No group');
-            $table->string('name')->unique()->nullable();
-            $table->integer('year')->nullable();
-                $table->integer('year_low')->nullable();
-                $table->integer('year_high')->nullable();
-            $table->integer('rate')->nullable();
-                // $table->integer('rate_low')->nullable();
-                // $table->integer('rate_high')->nullable();
-            $table->integer('term')->nullable();
-                // $table->integer('term_low')->nullable();
-                // $table->integer('term_high')->nullable();
             $table->json('columns')->nullable();
             $table->timestamps();
 

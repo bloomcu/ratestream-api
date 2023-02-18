@@ -26,8 +26,7 @@ class RateStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'nullable|string',
-            'rate' => 'nullable|numeric',
+            'uid' => 'required|string',
             'columns' => 'nullable|array',
         ];
     }

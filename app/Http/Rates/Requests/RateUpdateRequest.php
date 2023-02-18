@@ -26,8 +26,7 @@ class RateUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'nullable|string',
-            'rate' => 'nullable|numeric',
+            'uid' => 'nullable|string',
             'columns' => 'nullable|array',
         ];
     }

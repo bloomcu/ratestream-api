@@ -14,12 +14,12 @@ class RateImportController extends Controller
     public function import(Organization $organization, Request $request)
     {
         foreach ($request->csv as $row) {
-            $name = $row['name'];
+            $uid = $row['uid'];
             $group = $row['group'];
-            unset($row['name']);
+            unset($row['uid']);
             unset($row['group']);
 
-            $rate = Rate::updateOrCreate(['name' => $name], [
+            $rate = Rate::updateOrCreate(['uid' => $uid], [
                 'organization_id' => $organization->id,
                 'user_id' => $request->user()->id,
                 'rate_group_id' => $group,
