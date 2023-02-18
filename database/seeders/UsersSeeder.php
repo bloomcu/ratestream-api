@@ -18,12 +18,30 @@ class UsersSeeder extends Seeder
     public function run()
     {
         User::create([
-            'name' => 'John Doe',
-            'email' => 'john@doe.com',
+            'name' => 'Ryan Harmon',
+            'email' => 'ryan@bloomcu.com',
             'role' => 'admin',
             'organization_id' => 1,
             'email_verified_at' => now(),
             'password' => Hash::make('8;lkqthn35k;j6ltng3q5k;sG'),
+        ]);
+
+        User::create([
+            'name' => 'Derik Krauss',
+            'email' => 'derik@bloomcu.com',
+            'role' => 'admin',
+            'organization_id' => 1,
+            'email_verified_at' => now(),
+            'password' => Hash::make('qyS9eywPw9qREyXrQHh7Ret3qf'),
+        ]);
+
+        User::create([
+            'name' => 'Tray Northern',
+            'email' => 'traynorthern@yahoo.com',
+            'role' => 'admin',
+            'organization_id' => 1,
+            'email_verified_at' => now(),
+            'password' => Hash::make('A23dELmhMK2zYHcPW7tU7XzHbK'),
         ]);
     }
 }
