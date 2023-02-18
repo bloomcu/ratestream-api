@@ -5,6 +5,9 @@ namespace DDD\Http\Rates;
 use Illuminate\Http\Request;
 use DDD\App\Controllers\Controller;
 
+// Vendors
+use Spatie\QueryBuilder\QueryBuilder;
+
 // Models
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Rates\Rate;
@@ -20,20 +23,17 @@ class RateController extends Controller
 {
     public function index(Organization $organization)
     {
-        // Render rates nested into groups from api
-        // -----
-        // $rates = $organization->rates;
-        // $groups = $rates->pluck('group')->unique()->flatten();
-        // foreach ($groups as $group) {
-        //     $group->rates = array_filter($rates->toArray(), function ($rate) use ($group) {
-        //         return $rate['group']['title'] === $group->title;
-        //     });
-        // }
-        // return $groups;
+        $rates = QueryBuilder::for(Rate::class)
+            ->where('organization_id', $organization->id)
+            ->allowedFilters([
+                'uid',
+                'columns->rate',
+            ])
+            // ->latest()
+            ->get();
 
-        // Render rates using filter in store
-        // -----
-        $rates = $organization->rates;
+        // Pluck rate groups
+        // $rates = $organization->rates;
         $groups = $rates->pluck('group')->filter()->unique()->flatten();
         return [
             'rates' => RateResource::collection($rates),
