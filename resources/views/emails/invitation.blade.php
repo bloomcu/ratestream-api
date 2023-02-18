@@ -4,8 +4,8 @@
     <title>Invitation email</title>
 </head>
 <div>
-    <h1>You've been invited to join the {{ $invitation->organization->title }} team</h1>
-    <p>Join forces with the team and help build your next website.</p>
+    <h1>You've been invited to join the {{ $invitation->organization->title }} team.</h1>
+    <p>Join forces with your team inside RateStream.io.</p>
 
     <a href="{{ $invitation->url() }}">Join now</a>
 
