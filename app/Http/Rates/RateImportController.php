@@ -9,15 +9,19 @@ use DDD\App\Controllers\Controller;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Rates\Rate;
 
+// Resources
+use DDD\Http\Rates\Resources\RateResource;
+
 class RateImportController extends Controller
 {
     public function import(Organization $organization, Request $request)
     {
         foreach ($request->csv as $row) {
             $uid = $row['uid'];
-            $group = $row['group'];
-            unset($row['uid']);
-            unset($row['group']);
+                unset($row['uid']);
+
+            $group = isset($row['group']) ? $row['group'] : null;
+                unset($row['group']);
 
             $rate = Rate::updateOrCreate(['uid' => $uid], [
                 'organization_id' => $organization->id,
@@ -28,7 +32,8 @@ class RateImportController extends Controller
         }
 
         return response()->json([
-            'message' => 'Rates imported'
+            'message' => 'Rates imported',
+            'data' => new RateResource($rate)
         ], 200);
 
         // $rates = $organization->rates;
@@ -61,11 +66,5 @@ class RateImportController extends Controller
         //         'column' => 'term'
         //     ],
         // ];
-
-        // $organization->rates()->upsert(
-        //     [], // values to be upserted
-        //     ['name'], // unique identifier
-        //     ['group', 'columns'] // columns to be updated
-        // );
     }
 }

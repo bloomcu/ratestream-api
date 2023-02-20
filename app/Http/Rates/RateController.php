@@ -25,22 +25,25 @@ class RateController extends Controller
     {
         $rates = QueryBuilder::for(Rate::class)
             ->where('organization_id', $organization->id)
-            ->allowedFilters([
-                'uid',
-                'columns->rate',
-            ])
-            // ->latest()
+            ->allowedFilters(['uid', 'columns->rate'])
             ->get();
+
+        $columns = $rates->map(function ($rate) {
+            return collect($rate->columns)->keys();
+        })->unique()->flatten();
+
+        return [
+            'rates' => RateResource::collection($rates),
+            'columns' => $columns
+        ];
 
         // Pluck rate groups
         // $rates = $organization->rates;
-        $groups = $rates->pluck('group')->filter()->unique()->flatten();
-        return [
-            'rates' => RateResource::collection($rates),
-            'groups' => $groups
-        ];
-
-        // return RateResource::collection($rates);
+        // $groups = $rates->pluck('group')->filter()->unique()->flatten();
+        // return [
+        //     'rates' => RateResource::collection($rates),
+        //     'groups' => $groups
+        // ];
     }
 
     public function store(Organization $organization, RateStoreRequest $request)
