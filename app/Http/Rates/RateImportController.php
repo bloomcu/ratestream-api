@@ -17,11 +17,11 @@ class RateImportController extends Controller
     public function import(Organization $organization, Request $request)
     {
         foreach ($request->csv as $row) {
-            $uid = $row['uid'];
-                unset($row['uid']);
+            $uid = $row['Unique ID'];
+            unset($row['Unique ID']);
 
-            $group = isset($row['group']) ? $row['group'] : null;
-                unset($row['group']);
+            // $group = isset($row['group']) ? $row['group'] : null;
+            // unset($row['group']);
 
             $rate = Rate::updateOrCreate(['uid' => $uid], [
                 'organization_id' => $organization->id,
