@@ -38,15 +38,40 @@ class FileController extends Controller
 
     public function show(Organization $organization, File $file)
     {
+        // Setup CSV data
         $stream = fopen(Storage::path($file->path), 'r');
         $csv = Reader::createFromStream($stream);
         $csv->setHeaderOffset(0);
+        $headers = $csv->getHeader();
+
+        if (in_array('Unique ID', $headers)) {
+            return response()->json([
+                // 'data' => [
+                //     'headers' => $csv->getHeader(),
+                //     'csv' => $csv,
+                // ]
+                'headers' => $csv->getHeader(),
+                'csv' => $csv,
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'There is a problem with this CSV file.',
+                'errors' => [
+                    'uid' => [
+                        'The "Unique UD" column is missing in your CSV file.'
+                    ]
+                ],
+                'headers' => $csv->getHeader(),
+                'csv' => $csv,
+            ], 200);
+        }
+
+        // return [
+        //     'headers' => $csv->getHeader(),
+        //     'csv' => $csv,
+        // ];
 
         // return new FileResource($file);
-        return [
-            'headers' => $csv->getHeader(),
-            'csv' => $csv,
-        ];
     }
 
     public function update(Organization $organization, File $file, Request $request)
