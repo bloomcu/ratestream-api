@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class AuthLoginRequest extends FormRequest
+class AuthPasswordForgotRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -17,7 +17,6 @@ class AuthLoginRequest extends FormRequest
     {
         return [
             'email' => ['required', 'email:rfc,strict', 'max:255'],
-            'password' => ['required', 'string'],
         ];
     }
 
