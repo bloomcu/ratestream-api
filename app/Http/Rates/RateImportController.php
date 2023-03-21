@@ -23,12 +23,32 @@ class RateImportController extends Controller
             // $group = isset($row['group']) ? $row['group'] : null;
             // unset($row['group']);
 
+            // $rate = Rate::updateOrCreate(['uid' => $uid], [
+            //     'organization_id' => $organization->id,
+            //     'user_id' => $request->user()->id,
+            //     // 'rate_group_id' => $group,
+            //     'columns' => $row
+            // ]);
+
             $rate = Rate::updateOrCreate(['uid' => $uid], [
                 'organization_id' => $organization->id,
                 'user_id' => $request->user()->id,
-                // 'rate_group_id' => $group,
-                'columns' => $row
             ]);
+
+            $rate->columns = array_merge($rate->columns, $row);
+
+            $rate->save();
+
+            // $rate = Rate::firstOrNew(['uid' => $uid], [
+            //     'organization_id' => $organization->id,
+            //     'user_id' => $request->user()->id,
+            //     // 'rate_group_id' => $group,
+            //     // 'columns' => $row
+            // ]);
+            //
+            // foreach ($rate->columns as $column) {
+            //
+            // }
         }
 
         return response()->json([
