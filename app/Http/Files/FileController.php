@@ -42,16 +42,15 @@ class FileController extends Controller
         $stream = fopen(Storage::path($file->path), 'r');
         $csv = Reader::createFromStream($stream);
         $csv->setHeaderOffset(0);
-        $headers = $csv->getHeader();
+        $columns = $csv->getHeader();
+        $rows = $csv;
 
-        if (in_array('Unique ID', $headers)) {
+        if (in_array('Unique ID', $columns)) {
             return response()->json([
                 // 'data' => [
-                //     'headers' => $csv->getHeader(),
-                //     'csv' => $csv,
+                    'columns' => $columns,
+                    'rows' => $rows,
                 // ]
-                'headers' => $csv->getHeader(),
-                'csv' => $csv,
             ], 200);
         } else {
             return response()->json([
@@ -61,8 +60,8 @@ class FileController extends Controller
                         'The "Unique UD" column is missing in your CSV file.'
                     ]
                 ],
-                'headers' => $csv->getHeader(),
-                'csv' => $csv,
+                'columns' => $columns,
+                'rows' => $rows,
             ], 200);
         }
 

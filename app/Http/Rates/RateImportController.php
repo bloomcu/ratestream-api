@@ -16,7 +16,7 @@ class RateImportController extends Controller
 {
     public function import(Organization $organization, Request $request)
     {
-        foreach ($request->csv as $row) {
+        foreach ($request->rows as $row) {
             $uid = $row['Unique ID'];
             unset($row['Unique ID']);
 
