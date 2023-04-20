@@ -30,7 +30,9 @@ class RateController extends Controller
 
         $columns = $rates->map(function ($rate) {
             return collect($rate->columns)->keys();
-        })->unique()->flatten();
+        })->flatten() // Combine all collections
+          ->unique()  // Keep only unique values
+          ->values(); // Omit array keys
 
         return [
             'rates' => RateResource::collection($rates),
