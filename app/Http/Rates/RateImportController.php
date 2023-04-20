@@ -19,8 +19,8 @@ class RateImportController extends Controller
 {
     public function import(Organization $organization, RateImportRequest $request)
     {
-        // TODO: Validate each row has a Unique ID column
-        
+        // TODO: Validate $request->columns includes "Unique ID"
+
         foreach ($request->rows as $row) {
             $uid = $row['Unique ID'];
             unset($row['Unique ID']);

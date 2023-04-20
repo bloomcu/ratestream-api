@@ -4,6 +4,7 @@ namespace DDD\Http\Rates\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class RateImportRequest extends FormRequest
@@ -28,6 +29,7 @@ class RateImportRequest extends FormRequest
         return [
             'columns' => 'required|array',
             'rows' => 'required|array',
+            'rows.*' => 'required_array_keys:Unique ID'
         ];
     }
 
