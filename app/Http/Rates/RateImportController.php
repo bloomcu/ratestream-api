@@ -12,21 +12,19 @@ use DDD\Domain\Rates\Rate;
 // Resources
 use DDD\Http\Rates\Resources\RateResource;
 
+// Requests
+use DDD\Http\Rates\Requests\RateImportRequest;
+
 class RateImportController extends Controller
 {
-    public function import(Organization $organization, Request $request)
+    public function import(Organization $organization, RateImportRequest $request)
     {
+        // TODO: Validate each row has a Unique ID column
+        
         foreach ($request->rows as $row) {
             $uid = $row['Unique ID'];
             unset($row['Unique ID']);
-
-            // $rate = Rate::updateOrCreate(['uid' => $uid], [
-            //     'organization_id' => $organization->id,
-            //     'user_id' => $request->user()->id,
-            //     // 'rate_group_id' => $group,
-            //     'columns' => $row
-            // ]);
-
+            
             $rate = Rate::updateOrCreate(['uid' => $uid], [
                 'organization_id' => $organization->id,
                 'user_id' => $request->user()->id,
@@ -41,36 +39,5 @@ class RateImportController extends Controller
             'message' => 'Rates imported',
             'data' => new RateResource($rate)
         ], 200);
-
-        // $rates = $organization->rates;
-        // $groups = $rates->pluck('group')->unique()->flatten();
-        // $request->csv
-        // $rates = array_filter($request->csv, function ($row) {
-        //     dd($row);
-        //     return $row['group']['title'] != $group->title;
-        // });
-
-        // $mappings = [
-        //     [
-        //         'header' => 'year',
-        //         'column' => 'year'
-        //     ],
-        //     [
-        //         'header' => 'year_low',
-        //         'column' => 'year_low'
-        //     ],
-        //     [
-        //         'header' => 'year_high',
-        //         'column' => 'year_high'
-        //     ],
-        //     [
-        //         'header' => 'rate',
-        //         'column' => 'rate'
-        //     ],
-        //     [
-        //         'header' => 'term',
-        //         'column' => 'term'
-        //     ],
-        // ];
     }
 }
