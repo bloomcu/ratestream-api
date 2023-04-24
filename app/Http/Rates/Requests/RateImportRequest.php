@@ -28,6 +28,7 @@ class RateImportRequest extends FormRequest
     {
         return [
             'columns' => 'required|array',
+            'columns.*' => 'required|string',
             'rows' => 'required|array',
             'rows.*' => 'required_array_keys:Unique ID'
         ];

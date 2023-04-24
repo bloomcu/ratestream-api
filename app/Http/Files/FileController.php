@@ -39,17 +39,33 @@ class FileController extends Controller
     public function show(Organization $organization, File $file)
     {
         // Setup CSV data
-        $stream = fopen(Storage::path($file->path), 'r');
-        $csv = Reader::createFromStream($stream);
-        $csv->setHeaderOffset(0);
-        $columns = $csv->getHeader();
-        $rows = $csv;
+        // $stream = fopen(Storage::path($file->path), 'r');
+        // $csv = Reader::createFromStream($stream);
+        // $csv->setHeaderOffset(0);
+        // $csv->skipEmptyRecords(); // Do we need this?
+
+        try {
+            // Setup CSV data
+            $stream = fopen(Storage::path($file->path), 'r');
+            $csv = Reader::createFromStream($stream);
+            $csv->setHeaderOffset(0);
+            $columns = $csv->getHeader(); // Throws a SyntaxError exception
+        } catch (\Exception $exception) {
+            return response()->json([
+                'message' => 'There are duplicate columns headings in your CSV',
+                'errors' => [
+                    'uid' => [
+                        'There is a problem with this CSV. Please review our formatting rules.'
+                    ]
+                ],
+            ], 200);
+        }
 
         if (in_array('Unique ID', $columns)) {
             return response()->json([
                 // 'data' => [
                     'columns' => $columns,
-                    'rows' => $rows,
+                    'rows' => $csv,
                 // ]
             ], 200);
         } else {
@@ -57,11 +73,11 @@ class FileController extends Controller
                 'message' => 'There is a problem with this CSV file.',
                 'errors' => [
                     'uid' => [
-                        'The "Unique UD" column is missing in your CSV file.'
+                        'The "Unique ID" column is missing in your CSV file.'
                     ]
                 ],
                 'columns' => $columns,
-                'rows' => $rows,
+                'rows' => $csv,
             ], 200);
         }
 
