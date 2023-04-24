@@ -52,7 +52,7 @@ class FileController extends Controller
             $columns = $csv->getHeader(); // Throws a SyntaxError exception
         } catch (\Exception $exception) {
             return response()->json([
-                'message' => 'There are duplicate columns headings in your CSV',
+                'message' => 'There are duplicate column headers in your CSV',
                 'errors' => [
                     'uid' => [
                         'There is a problem with this CSV. Please review our formatting rules.'
