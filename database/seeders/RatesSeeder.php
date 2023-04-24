@@ -19,62 +19,78 @@ class RatesSeeder extends Seeder
         $rates = [
             // Unsecured
             [
+                'uid' => 'Unsecured - 36',
                 'rate_group_id' => 1,
-                'name' => 'Unsecured - 36',
-                'term' => 36,
-                'rate' => 8.74,
+                'columns' => [
+                    'term' => 36,
+                    'rate' => 8.74,
+                ],
             ],
             [
+                'uid' => 'Unsecured - 48',
                 'rate_group_id' => 1,
-                'name' => 'Unsecured - 48',
-                'term' => 48,
-                'rate' => 9.74,
+                'columns' => [
+                    'term' => 48,
+                    'rate' => 9.74,
+                ],
             ],
             [
+                'uid' => 'Unsecured - 60',
                 'rate_group_id' => 1,
-                'name' => 'Unsecured - 60',
-                'term' => 60,
-                'rate' => 10.74,
+                'columns' => [
+                    'term' => 60,
+                    'rate' => 10.74,
+                ],
             ],
 
             // New Auto Loan
             [
+                'uid' => 'New Auto Loan - 36',
                 'rate_group_id' => 2,
-                'name' => 'New Auto Loan - 36',
-                'year_low' => '2021',
-                'year_high' => '2023',
-                'term' => 36,
-                'rate' => 5.49,
+                'columns' => [
+                    'year_low' => '2021',
+                    'year_high' => '2023',
+                    'term' => 36,
+                    'rate' => 5.49,
+                ],
             ],
             [
+                'uid' => 'New Auto Loan - 48',
                 'rate_group_id' => 2,
-                'name' => 'New Auto Loan - 48',
-                'year_low' => '2021',
-                'year_high' => '2023',
-                'term' => 48,
-                'rate' => 5.74,
+                'columns' => [
+                    'year_low' => '2021',
+                    'year_high' => '2023',
+                    'term' => 48,
+                    'rate' => 5.74,
+                ],
             ],
             [
+                'uid' => 'New Auto Loan - 66',
                 'rate_group_id' => 2,
-                'name' => 'New Auto Loan - 66',
-                'year_low' => '2021',
-                'year_high' => '2023',
-                'term' => 66,
-                'rate' => 5.99,
+                'columns' => [
+                    'year_low' => '2021',
+                    'year_high' => '2023',
+                    'term' => 66,
+                    'rate' => 5.99,
+                ],
             ],
 
             // Classic Car
             [
+                'uid' => 'Classic Car - 36',
                 'rate_group_id' => 3,
-                'name' => 'Classic Car - 36',
-                'term' => 36,
-                'rate' => 8.64,
+                'columns' => [
+                    'term' => 36,
+                    'rate' => 8.64,
+                ],
             ],
             [
+                'uid' => 'Classic Car - 48',
                 'rate_group_id' => 3,
-                'name' => 'Classic Car - 48',
-                'term' => 48,
-                'rate' => 9.64,
+                'columns' => [
+                    'term' => 48,
+                    'rate' => 9.64,
+                ],
             ],
         ];
 

@@ -1,23 +1,13 @@
 <?php
 
-namespace DDD\Http\Rates\Requests;
+namespace DDD\Http\Base\Auth\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class RateUpdateRequest extends FormRequest
+class AuthPasswordForgotRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
-        return true;
-    }
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -26,8 +16,7 @@ class RateUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'uid' => 'nullable|string',
-            'columns' => 'nullable|array',
+            'email' => ['required', 'email:rfc,strict', 'max:255'],
         ];
     }
 

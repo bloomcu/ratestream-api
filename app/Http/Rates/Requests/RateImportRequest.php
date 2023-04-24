@@ -4,9 +4,10 @@ namespace DDD\Http\Rates\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class RateUpdateRequest extends FormRequest
+class RateImportRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,8 +27,10 @@ class RateUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'uid' => 'nullable|string',
-            'columns' => 'nullable|array',
+            'columns' => 'required|array',
+            'columns.*' => 'required|string',
+            'rows' => 'required|array',
+            'rows.*' => 'required_array_keys:Unique ID'
         ];
     }
 
