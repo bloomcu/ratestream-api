@@ -27,7 +27,7 @@ class RateUpdateRequest extends FormRequest
     {
         return [
             'uid' => 'nullable|string',
-            'columns' => 'nullable|array',
+            'data' => 'nullable|array',
         ];
     }
 

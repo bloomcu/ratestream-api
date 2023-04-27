@@ -4,7 +4,7 @@ namespace DDD\Domain\Rates\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 
-class RateColumns implements CastsAttributes
+class RateData implements CastsAttributes
 {
     /**
      * Cast the given value.
@@ -20,17 +20,6 @@ class RateColumns implements CastsAttributes
         $value = isset($value) ? json_decode($value, true) : [];
 
         return $value;
-
-        // $defaults = [
-        //     'launch_date' => null,
-        //     'freeze_date' => null,
-        //     'dev_domain' => null,
-        //     'prod_domain' => null,
-        //     'prod_ip' => null,
-        //     'notes' => null,
-        // ];
-        //
-        // return array_merge($defaults, $value);
     }
 
     /**
@@ -45,6 +34,8 @@ class RateColumns implements CastsAttributes
     public function set($model, string $key, $value, array $attributes)
     {
         if (isset($value)) {
+            $value = array_merge($model->data, $value); // Merge existing data with new
+
             return json_encode($value);
         }
     }
