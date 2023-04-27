@@ -27,10 +27,10 @@ class CSVController extends Controller
 
         if (in_array('Unique ID', $columns)) {
             return response()->json([
-                // 'data' => [
+                'data' => [
                     'columns' => $columns,
                     'rows' => $csv,
-                // ]
+                ]
             ], 200);
         } else {
             return response()->json([
