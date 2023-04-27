@@ -19,8 +19,9 @@ class RateImportController extends Controller
 {
     public function import(Organization $organization, RateImportRequest $request)
     {
-        // TODO: Validate $request->columns includes "Unique ID"
+        // TODO: Validate $request->data includes "Unique ID"?
 
+        // TODO: Change rows to 'rates' we don't use the term rows in the rate domain
         foreach ($request->rows as $row) {
             $uid = $row['Unique ID'];
             unset($row['Unique ID']);
@@ -30,14 +31,14 @@ class RateImportController extends Controller
                 'user_id' => $request->user()->id,
             ]);
 
-            $rate->columns = array_merge($rate->columns, $row);
+            $rate->data = array_merge($rate->data, $row);
 
             $rate->save();
         }
 
         return response()->json([
             'message' => 'Rates imported',
-            'data' => new RateResource($rate)
+            'data' => new RateResource($rate) // This shows the last rate updated
         ], 200);
     }
 }

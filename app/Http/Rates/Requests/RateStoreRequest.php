@@ -27,7 +27,7 @@ class RateStoreRequest extends FormRequest
     {
         return [
             'uid' => 'required|string',
-            'columns' => 'nullable|array',
+            'data' => 'nullable|array',
         ];
     }
 

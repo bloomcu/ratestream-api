@@ -21,7 +21,7 @@ class RatesSeeder extends Seeder
             [
                 'uid' => 'Unsecured - 36',
                 'rate_group_id' => 1,
-                'columns' => [
+                'data' => [
                     'term' => 36,
                     'rate' => 8.74,
                 ],
@@ -29,7 +29,7 @@ class RatesSeeder extends Seeder
             [
                 'uid' => 'Unsecured - 48',
                 'rate_group_id' => 1,
-                'columns' => [
+                'data' => [
                     'term' => 48,
                     'rate' => 9.74,
                 ],
@@ -37,7 +37,7 @@ class RatesSeeder extends Seeder
             [
                 'uid' => 'Unsecured - 60',
                 'rate_group_id' => 1,
-                'columns' => [
+                'data' => [
                     'term' => 60,
                     'rate' => 10.74,
                 ],
@@ -47,7 +47,7 @@ class RatesSeeder extends Seeder
             [
                 'uid' => 'New Auto Loan - 36',
                 'rate_group_id' => 2,
-                'columns' => [
+                'data' => [
                     'year_low' => '2021',
                     'year_high' => '2023',
                     'term' => 36,
@@ -57,7 +57,7 @@ class RatesSeeder extends Seeder
             [
                 'uid' => 'New Auto Loan - 48',
                 'rate_group_id' => 2,
-                'columns' => [
+                'data' => [
                     'year_low' => '2021',
                     'year_high' => '2023',
                     'term' => 48,
@@ -67,7 +67,7 @@ class RatesSeeder extends Seeder
             [
                 'uid' => 'New Auto Loan - 66',
                 'rate_group_id' => 2,
-                'columns' => [
+                'data' => [
                     'year_low' => '2021',
                     'year_high' => '2023',
                     'term' => 66,
@@ -79,7 +79,7 @@ class RatesSeeder extends Seeder
             [
                 'uid' => 'Classic Car - 36',
                 'rate_group_id' => 3,
-                'columns' => [
+                'data' => [
                     'term' => 36,
                     'rate' => 8.64,
                 ],
@@ -87,7 +87,7 @@ class RatesSeeder extends Seeder
             [
                 'uid' => 'Classic Car - 48',
                 'rate_group_id' => 3,
-                'columns' => [
+                'data' => [
                     'term' => 48,
                     'rate' => 9.64,
                 ],

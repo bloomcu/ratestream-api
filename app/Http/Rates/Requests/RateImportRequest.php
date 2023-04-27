@@ -27,8 +27,10 @@ class RateImportRequest extends FormRequest
     public function rules()
     {
         return [
-            'columns' => 'required|array',
-            'columns.*' => 'required|string',
+            // 'data' => 'required|array',
+            // 'data.*' => 'required|string',
+            
+            // TODO: Change rows to 'rates' we don't use the term rows in the rate domain
             'rows' => 'required|array',
             'rows.*' => 'required_array_keys:Unique ID'
         ];
