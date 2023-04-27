@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 // Casts
-use DDD\Domain\Rates\Casts\RateColumns;
+use DDD\Domain\Rates\Casts\RateData;
 
 // Traits
 use DDD\App\Traits\BelongsToOrganization;
@@ -22,19 +22,19 @@ class Rate extends Model
         'id',
     ];
 
-    protected $with = ['group'];
+    // protected $with = ['group'];
 
     protected $casts = [
-        'columns' => RateColumns::class,
+        'data' => RateData::class,
     ];
 
-    /**
-     * Rate group this model belongs to.
-     *
-     * @return belongsTo
-     */
-    public function group()
-    {
-        return $this->belongsTo('DDD\Domain\Rates\RateGroup', 'rate_group_id');
-    }
+    // /**
+    //  * Rate group this model belongs to.
+    //  *
+    //  * @return belongsTo
+    //  */
+    // public function group()
+    // {
+    //     return $this->belongsTo('DDD\Domain\Rates\RateGroup', 'rate_group_id');
+    // }
 }

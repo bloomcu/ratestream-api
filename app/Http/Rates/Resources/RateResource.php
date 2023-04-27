@@ -17,7 +17,7 @@ class RateResource extends JsonResource
         return [
             'id' => $this->id,
             'uid' => $this->uid,
-            'group' => $this->whenLoaded('group', fn() => $this->group->title),
+            // 'group' => $this->whenLoaded('group', fn() => $this->group->title),
             // 'group' => $this->whenLoaded('group'),
             // 'rate' => $this->rate,
                 // 'rate_low' => $this->rate_low,
@@ -29,7 +29,7 @@ class RateResource extends JsonResource
             // 'year' => $this->year,
                 // 'year_low' => $this->year_low,
                 // 'year_high' => $this->year_high,
-            'columns' => $this->columns,
+            'data' => $this->data,
         ];
     }
 }

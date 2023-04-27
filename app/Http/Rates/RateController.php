@@ -25,18 +25,18 @@ class RateController extends Controller
     {
         $rates = QueryBuilder::for(Rate::class)
             ->where('organization_id', $organization->id)
-            ->allowedFilters(['uid', 'columns->rate'])
+            ->allowedFilters(['uid', 'data->rate'])
             ->get();
 
         $columns = $rates->map(function ($rate) {
-            return collect($rate->columns)->keys();
+            return collect($rate->data)->keys();
         })->flatten() // Combine all collections
           ->unique()  // Keep only unique values
           ->values(); // Omit array keys
 
         return [
+            'columns' => $columns,
             'rates' => RateResource::collection($rates),
-            'columns' => $columns
         ];
 
         // Pluck rate groups
