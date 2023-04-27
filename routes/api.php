@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use DDD\Http\Rates\RateController;
 use DDD\Http\Rates\RateImportController;
-use DDD\Http\Files\FileController;
+use DDD\Http\CSV\CSVController;
 
 // Rates - Public
 Route::prefix('{organization:slug}/rates')->group(function() {
@@ -28,11 +28,8 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::post('/', [RateImportController::class, 'import']);
     });
 
-    // Files
-    Route::prefix('{organization:slug}/files')->group(function() {
-        Route::get('/', [FileController::class, 'index']);
-        Route::post('/', [FileController::class, 'store']);
-        Route::get('/{file}', [FileController::class, 'show']);
-        Route::delete('/{file}', [FileController::class, 'destroy']);
+    // CSVs
+    Route::prefix('{organization:slug}/csv')->group(function() {
+        Route::get('/{file}', [CSVController::class, 'show']);
     });
 });
