@@ -7,6 +7,16 @@ use DDD\Domain\Base\Organizations\Organization as BaseOrganization;
 
 class Organization extends BaseOrganization {
     /**
+     * columns associated with the organization.
+     *
+     * @return hasMany
+     */
+    public function columns()
+    {
+        return $this->hasMany('DDD\Domain\Columns\Column');
+    }
+
+    /**
      * Pages associated with the organization.
      *
      * @return hasMany
