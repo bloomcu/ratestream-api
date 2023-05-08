@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('user_id');
             $table->string('uid')->unique()->nullable();
             $table->foreignId('rate_group_id')->nullable();
-            $table->json('data')->nullable();
+            $table->json('columns')->nullable();
             $table->timestamps();
 
             // Foreign constraints

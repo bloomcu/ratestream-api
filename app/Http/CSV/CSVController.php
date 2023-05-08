@@ -20,8 +20,9 @@ class CSVController extends Controller
     public function show(Organization $organization, File $file)
     {
         // Setup CSV data
-        $stream = fopen(Storage::path($file->path), 'r');
-        $csv = Reader::createFromStream($stream);
+        $csvFile = Storage::get($file->path);
+        
+        $csv = Reader::createFromString($csvFile);
         $csv->setHeaderOffset(0);
         $columns = $csv->getHeader();
 
