@@ -1,0 +1,26 @@
+id: 46515
+name: ratestream-api
+environments:
+    production:
+        memory: 1024
+        cli-memory: 512
+        runtime: 'php-8.2:al2'
+        database: 'ratestream-api'
+        storage: 'ratestream-storage'
+        build:
+            - 'composer install --no-dev'
+            - 'php artisan event:cache'
+        deploy:
+            - 'php artisan migrate --force'
+        domain: api.ratestream.io
+    staging:
+            memory: 1024
+            cli-memory: 512
+            runtime: 'php-8.2:al2'
+            database: 'staging-ratestream-api'
+            storage: 'staging-ratestream-storage'
+            build:
+                - 'composer install --no-dev'
+                - 'php artisan event:cache'
+            deploy:
+                - 'php artisan migrate'
