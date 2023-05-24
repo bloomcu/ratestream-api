@@ -5,8 +5,9 @@ namespace DDD\Http\Columns\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
-class ColumnStoreRequest extends FormRequest
+class ColumnOrderUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,8 +27,7 @@ class ColumnStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|unique:columns',
-            'order' => 'nullable|array',
+            'order' => 'integer',
         ];
     }
 

@@ -7,9 +7,11 @@ use DDD\App\Controllers\Controller;
 
 // Models
 use DDD\Domain\Organizations\Organization;
+use DDD\Domain\Columns\Column;
 use DDD\Domain\Rates\Rate;
 
 // Resources
+use DDD\Http\Columns\Resources\ColumnResource;
 use DDD\Http\Rates\Resources\RateResource;
 
 // Requests
@@ -21,10 +23,9 @@ class RateImportController extends Controller
     {
         // TODO: Validate $request->data includes "Unique ID"?
 
-        // TODO: Change rows to 'rates' we don't use the term rows in the rate domain
         foreach ($request->rows as $row) {
             $uid = $row['Unique ID'];
-            unset($row['Unique ID']);
+            unset($row['Unique ID']); // Excludes uid from columns
             
             $rate = Rate::updateOrCreate(['uid' => $uid], [
                 'organization_id' => $organization->id,
@@ -36,9 +37,26 @@ class RateImportController extends Controller
             $rate->save();
         }
 
+        foreach ($request->columns as $column) {
+            if ($column === 'Unique ID') {
+                continue;
+            }
+
+            $column = Column::firstOrNew(['name' => $column], [
+                'organization_id' => $organization->id,
+                'user_id' => $request->user()->id,
+                'name' => $column,
+            ]);
+
+            $column->save();
+        }
+
         return response()->json([
             'message' => 'Rates imported',
-            'data' => new RateResource($rate) // This shows the last rate updated
+            'data' => [
+                'columns' => ColumnResource::collection($organization->columns),
+                'rates' => RateResource::collection($organization->rates),
+            ]
         ], 200);
     }
 }

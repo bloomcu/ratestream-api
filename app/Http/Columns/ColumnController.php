@@ -5,9 +5,6 @@ namespace DDD\Http\Columns;
 use Illuminate\Http\Request;
 use DDD\App\Controllers\Controller;
 
-// Vendors
-use Spatie\QueryBuilder\QueryBuilder;
-
 // Models
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Columns\Column;

@@ -5,6 +5,7 @@ namespace DDD\Http\Columns\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
 class ColumnUpdateRequest extends FormRequest
 {
@@ -26,8 +27,12 @@ class ColumnUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'uid' => 'nullable|string',
-            'data' => 'nullable|array',
+            'name' => [
+                'nullable',
+                'string',
+                Rule::unique('columns')->ignore($this->id),
+            ],
+            'order' => 'nullable|integer',
         ];
     }
 
