@@ -18,6 +18,7 @@ use DDD\Http\Rates\Requests\RateUpdateRequest;
 
 // Resources
 use DDD\Http\Rates\Resources\RateResource;
+use DDD\Http\Columns\Resources\ColumnResource;
 
 class RateController extends Controller
 {
@@ -28,14 +29,10 @@ class RateController extends Controller
             ->allowedFilters(['uid', 'data->rate'])
             ->get();
 
-        $columns = $rates->map(function ($rate) {
-            return collect($rate->data)->keys();
-        })->flatten() // Combine all collections
-          ->unique()  // Keep only unique values
-          ->values(); // Omit array keys
+        $columns = $organization->columns()->orderBy('order')->get();
 
         return [
-            'columns' => $columns,
+            'columns' => ColumnResource::collection($columns),
             'rates' => RateResource::collection($rates),
         ];
 
@@ -52,14 +49,12 @@ class RateController extends Controller
     {
         $rate = $organization->rates()->create($request->validated());
 
-        // return new RateResource($rate);
-        return $rate;
+        return new RateResource($rate);
     }
 
     public function show(Organization $organization, Rate $rate)
     {
-        // return new RateResource($rate);
-        return $rate;
+        return new RateResource($rate);
     }
 
     public function update(Organization $organization, Rate $rate, RateUpdateRequest $request)
@@ -67,14 +62,12 @@ class RateController extends Controller
         $rate->update($request->validated());
 
         return new RateResource($rate);
-        // return $rate;
     }
 
     public function destroy(Organization $organization, Rate $rate)
     {
         $rate->delete();
 
-        // return new RateResource($rate);
-        return $rate;
+        return new RateResource($rate);
     }
 }
