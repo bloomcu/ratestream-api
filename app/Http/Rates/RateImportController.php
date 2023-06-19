@@ -27,12 +27,28 @@ class RateImportController extends Controller
             $uid = $row['Unique ID'];
             unset($row['Unique ID']); // Excludes uid from columns
             
-            $rate = Rate::updateOrCreate(['uid' => $uid], [
-                'organization_id' => $organization->id,
-                'user_id' => $request->user()->id,
-            ]);
+            $rate = Rate::updateOrCreate(
+                [
+                    'uid' => $uid,
+                    'organization_id' => $organization->id,
+                ], 
+                [
+                    'organization_id' => $organization->id,
+                    'user_id' => $request->user()->id,
+                ]
+            );
 
             $rate->data = array_merge($rate->data, $row);
+
+            // Trim each key and value
+            // $keys = array_map('trim', array_keys($row));
+            // $values = array_map('trim', $row);
+            // $trimmedData = array_combine($keys, $values);
+            // $rate->data = array_merge($rate->data, $trimmedData);
+            // dd([
+            //     'original' => $row,
+            //     'trimmed' => $trimmedData
+            // ]);
 
             $rate->save();
         }
@@ -42,11 +58,17 @@ class RateImportController extends Controller
                 continue;
             }
 
-            $column = Column::firstOrNew(['name' => $column], [
-                'organization_id' => $organization->id,
-                'user_id' => $request->user()->id,
-                'name' => $column,
-            ]);
+            $column = Column::firstOrNew(
+                [
+                    'organization_id' => $organization->id,
+                    'name' => $column,
+                ], 
+                [
+                    'organization_id' => $organization->id,
+                    'user_id' => $request->user()->id,
+                    'name' => $column,
+                ]
+            );
 
             $column->save();
         }
