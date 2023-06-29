@@ -27,7 +27,7 @@ class ColumnStoreRequest extends FormRequest
     {
         return [
             'name' => 'required|string|unique:columns',
-            'order' => 'nullable|array',
+            'order' => 'nullable|integer',
         ];
     }
 
