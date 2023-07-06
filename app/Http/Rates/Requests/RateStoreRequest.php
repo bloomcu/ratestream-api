@@ -5,6 +5,7 @@ namespace DDD\Http\Rates\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
 class RateStoreRequest extends FormRequest
 {
@@ -26,7 +27,11 @@ class RateStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'uid' => 'required|string',
+            'uid' => [
+                'required',
+                'string',
+                Rule::unique('rates')->where('organization_id', $this->organization->id)
+            ],
             'data' => 'nullable|array',
         ];
     }
