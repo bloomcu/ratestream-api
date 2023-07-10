@@ -22,12 +22,13 @@ class RateBatchController extends Controller
     public function handle(Organization $organization, RateBatchRequest $request)
     {
         // TODO: Validate $request->data includes "Unique ID"?
+        // return $request->validated();
 
         foreach ($request->rates as $rate) {
-            $uid = $rate['Unique ID'];
-            unset($rate['Unique ID']); // Excludes uid from columns
+            $uid = $rate['uid'];
+            unset($rate['uid']); // Excludes uid from columns
             
-            $record = Rate::updateOrCreate(
+            $record = Rate::firstOrCreate(
                 [
                     'uid' => $uid,
                     'organization_id' => $organization->id,
@@ -38,21 +39,31 @@ class RateBatchController extends Controller
                 ]
             );
 
-            $record->data = array_merge($record->data, $rate);
+            $record['data'] = array_merge($record['data'], $rate['data']);
+
+            if (empty($record['data'])) {
+                continue;
+            }
 
             $record->save();
         }
 
         foreach ($request->columns as $column) {
-            if ($column === 'Unique ID') {
+            if ($column['name'] === 'Unique ID') {
                 continue;
             }
 
-            $column = Column::create([
-                'organization_id' => $organization->id,
-                'user_id' => $request->user()->id,
-                'name' => $column,
-            ]);
+            $column = Column::updateOrCreate(
+                [
+                    'name' => $column['name'],
+                    'organization_id' => $organization->id,
+                ], 
+                [
+                    'name' => $column['name'],
+                    'organization_id' => $organization->id,
+                    'user_id' => $request->user()->id,
+                ]
+            );
 
             $column->save();
         }

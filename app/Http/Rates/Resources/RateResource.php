@@ -15,7 +15,7 @@ class RateResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->id,
+            // 'id' => $this->id,
             'uid' => $this->uid,
             // 'group' => $this->whenLoaded('group', fn() => $this->group->title),
             // 'group' => $this->whenLoaded('group'),

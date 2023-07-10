@@ -32,8 +32,8 @@ class RateController extends Controller
         $columns = $organization->columns()->orderBy('order')->get();
 
         return [
-            'columns' => ColumnResource::collection($columns),
             'rates' => RateResource::collection($rates),
+            'columns' => ColumnResource::collection($columns),
         ];
 
         // Pluck rate groups

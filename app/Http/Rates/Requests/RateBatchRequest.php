@@ -4,7 +4,6 @@ namespace DDD\Http\Rates\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Validation\Rule;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class RateBatchRequest extends FormRequest
@@ -27,8 +26,9 @@ class RateBatchRequest extends FormRequest
     public function rules()
     {
         return [
-            'rates' => 'required|array',
-            'rates.*' => 'required_array_keys:Unique ID'
+            'rates' => 'array',
+            'rates.*' => 'required_array_keys:uid',
+            'columns' => 'array'
         ];
     }
 
