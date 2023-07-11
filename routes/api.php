@@ -14,7 +14,7 @@ use DDD\Http\Rates\RateUidController;
 // Rates - Public
 Route::prefix('{organization:slug}/rates')->group(function() {
     Route::get('/', [RateController::class, 'index']);
-    Route::get('/{rate}', [RateController::class, 'show']);
+    // Route::get('/{rate}', [RateController::class, 'show']);
 });
 
 Route::middleware('auth:sanctum')->group(function() {
@@ -35,11 +35,10 @@ Route::middleware('auth:sanctum')->group(function() {
 
     // Rates
     Route::prefix('{organization:slug}/rates')->group(function() {
-        // Route::get('/', [RateController::class, 'index']);
-        Route::post('/', [RateController::class, 'store']);
+        // Route::post('/', [RateController::class, 'store']);
         // Route::get('/{rate:uid}', [RateController::class, 'show']);
-        Route::put('/{rate:uid}', [RateController::class, 'update']);
-        Route::delete('/{rate:uid}', [RateController::class, 'destroy']);
+        // Route::put('/{rate:uid}', [RateController::class, 'update']);
+        // Route::delete('/{rate:uid}', [RateController::class, 'destroy']);
     });
 
     // Rates batch

@@ -24,11 +24,12 @@ class RateBatchController extends Controller
         // TODO: Validate $request->data includes "Unique ID"?
         // return $request->validated();
 
-        foreach ($request->rates as $rate) {
-            $uid = $rate['uid'];
-            unset($rate['uid']); // Excludes uid from columns
+        // Handle rates\ updates
+        foreach ($request->rates as $r) {
+            $uid = $r['uid'];
+            unset($r['uid']); // Excludes uid from columns
             
-            $record = Rate::firstOrCreate(
+            $rate = Rate::firstOrCreate(
                 [
                     'uid' => $uid,
                     'organization_id' => $organization->id,
@@ -39,33 +40,47 @@ class RateBatchController extends Controller
                 ]
             );
 
-            $record['data'] = array_merge($record['data'], $rate['data']);
+            $rate['data'] = array_merge($rate['data'], $r['data']);
 
-            if (empty($record['data'])) {
+            if (empty($rate['data'])) {
                 continue;
             }
 
-            $record->save();
+            $rate->save();
         }
 
-        foreach ($request->columns as $column) {
-            if ($column['name'] === 'Unique ID') {
+        // Handle column updates
+        foreach ($request->columns as $c) {
+            if ($c['name'] === 'Unique ID') {
                 continue;
             }
 
             $column = Column::updateOrCreate(
                 [
-                    'name' => $column['name'],
+                    'name' => $c['name'],
                     'organization_id' => $organization->id,
                 ], 
                 [
-                    'name' => $column['name'],
+                    'name' => $c['name'],
                     'organization_id' => $organization->id,
                     'user_id' => $request->user()->id,
                 ]
             );
 
             $column->save();
+        }
+
+        // Handle deletes
+        foreach ($request->deletes as $delete) {
+            if ($delete['model'] === 'rate') {
+                $record = Rate::where('uid', $delete['uid'])->first();
+            }
+
+            if ($delete['model'] === 'column') {
+                $record = Column::where('name', $delete['uid'])->first();
+            } 
+
+            $record->delete();
         }
 
         return response()->json([

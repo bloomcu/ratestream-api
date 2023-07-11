@@ -28,7 +28,13 @@ class RateBatchRequest extends FormRequest
         return [
             'rates' => 'array',
             'rates.*' => 'required_array_keys:uid',
-            'columns' => 'array'
+
+            'columns' => 'array',
+            // 'columns.*' => 'required_array_keys:uid',
+            'columns.*' => 'required_array_keys:name',
+
+            'deletes' => 'array',
+            // 'deletes.*' => 'required_array_keys:uid',
         ];
     }
 
