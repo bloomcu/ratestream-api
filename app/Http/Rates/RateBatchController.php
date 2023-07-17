@@ -39,7 +39,7 @@ class RateBatchController extends Controller
                     'user_id' => $request->user()->id,
                 ]
             );
-            // return $r['data'];
+            
             $rate['data'] = array_merge($rate['data'], $r['data']);
 
             if (empty($rate['data'])) {
