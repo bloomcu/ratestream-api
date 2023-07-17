@@ -27,7 +27,7 @@ class RateBatchController extends Controller
         // Handle rates\ updates
         foreach ($request->rates as $r) {
             $uid = $r['uid'];
-            unset($r['uid']); // Excludes uid from columns
+            unset($r['uid']); // Exclude uid
             
             $rate = Rate::firstOrCreate(
                 [
@@ -39,7 +39,7 @@ class RateBatchController extends Controller
                     'user_id' => $request->user()->id,
                 ]
             );
-
+            // return $r['data'];
             $rate['data'] = array_merge($rate['data'], $r['data']);
 
             if (empty($rate['data'])) {
@@ -57,10 +57,11 @@ class RateBatchController extends Controller
 
             $column = Column::updateOrCreate(
                 [
-                    'name' => $c['name'],
+                    'uid' => $c['uid'],
                     'organization_id' => $organization->id,
                 ], 
                 [
+                    'uid' => $c['uid'],
                     'name' => $c['name'],
                     'organization_id' => $organization->id,
                     'user_id' => $request->user()->id,
@@ -77,7 +78,7 @@ class RateBatchController extends Controller
             }
 
             if ($delete['model'] === 'column') {
-                $record = Column::where('name', $delete['uid'])->first();
+                $record = Column::where('uid', $delete['uid'])->first();
             } 
 
             $record->delete();
