@@ -23,6 +23,7 @@ class RateBatchController extends Controller
     {
         // TODO: Validate $request->data includes "Unique ID"?
         // return $request->validated();
+        // return $request->rates;
 
         // Handle rates\ updates
         foreach ($request->rates as $r) {
@@ -39,7 +40,7 @@ class RateBatchController extends Controller
                     'user_id' => $request->user()->id,
                 ]
             );
-            
+            // return $r['data'];
             $rate['data'] = array_merge($rate['data'], $r['data']);
 
             if (empty($rate['data'])) {
