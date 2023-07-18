@@ -40,7 +40,7 @@ class RateBatchController extends Controller
                     'user_id' => $request->user()->id,
                 ]
             );
-            // return $r['data'];
+            
             $rate['data'] = array_merge($rate['data'], $r['data']);
 
             if (empty($rate['data'])) {
@@ -82,7 +82,9 @@ class RateBatchController extends Controller
                 $record = Column::where('uid', $delete['uid'])->first();
             } 
 
-            $record->delete();
+            if ($record) {
+                $record->delete();
+            }
         }
 
         return response()->json([
