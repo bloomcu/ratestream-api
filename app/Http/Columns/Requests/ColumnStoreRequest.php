@@ -1,12 +1,12 @@
 <?php
 
-namespace DDD\Http\Rates\Requests;
+namespace DDD\Http\Columns\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class RateUpdateRequest extends FormRequest
+class ColumnStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,7 +26,8 @@ class RateUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'data' => 'nullable|array',
+            'name' => 'required|string|unique:columns',
+            'order' => 'nullable|integer',
         ];
     }
 

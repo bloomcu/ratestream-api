@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class RateUpdateRequest extends FormRequest
+class RateBatchRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,7 +26,15 @@ class RateUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'data' => 'nullable|array',
+            'rates' => 'array',
+            'rates.*' => 'required_array_keys:uid',
+
+            'columns' => 'array',
+            'columns.*' => 'required_array_keys:uid',
+            'columns.*' => 'required_array_keys:name',
+
+            'deletes' => 'array',
+            // 'deletes.*' => 'required_array_keys:uid',
         ];
     }
 

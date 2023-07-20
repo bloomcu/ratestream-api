@@ -18,6 +18,7 @@ use DDD\Http\Rates\Requests\RateUpdateRequest;
 
 // Resources
 use DDD\Http\Rates\Resources\RateResource;
+use DDD\Http\Columns\Resources\ColumnResource;
 
 class RateController extends Controller
 {
@@ -28,15 +29,11 @@ class RateController extends Controller
             ->allowedFilters(['uid', 'data->rate'])
             ->get();
 
-        $columns = $rates->map(function ($rate) {
-            return collect($rate->data)->keys();
-        })->flatten() // Combine all collections
-          ->unique()  // Keep only unique values
-          ->values(); // Omit array keys
+        $columns = $organization->columns()->orderBy('order')->get();
 
         return [
-            'columns' => $columns,
             'rates' => RateResource::collection($rates),
+            'columns' => ColumnResource::collection($columns),
         ];
 
         // Pluck rate groups
@@ -48,33 +45,29 @@ class RateController extends Controller
         // ];
     }
 
-    public function store(Organization $organization, RateStoreRequest $request)
-    {
-        $rate = $organization->rates()->create($request->validated());
+    // public function store(Organization $organization, RateStoreRequest $request)
+    // {
+    //     $rate = $organization->rates()->create($request->validated());
 
-        // return new RateResource($rate);
-        return $rate;
-    }
+    //     return new RateResource($rate);
+    // }
 
-    public function show(Organization $organization, Rate $rate)
-    {
-        // return new RateResource($rate);
-        return $rate;
-    }
+    // public function show(Organization $organization, Rate $rate)
+    // {
+    //     return new RateResource($rate);
+    // }
 
-    public function update(Organization $organization, Rate $rate, RateUpdateRequest $request)
-    {
-        $rate->update($request->validated());
+    // public function update(Organization $organization, Rate $rate, RateUpdateRequest $request)
+    // {
+    //     $rate->update($request->validated());
 
-        return new RateResource($rate);
-        // return $rate;
-    }
+    //     return new RateResource($rate);
+    // }
 
-    public function destroy(Organization $organization, Rate $rate)
-    {
-        $rate->delete();
+    // public function destroy(Organization $organization, Rate $rate)
+    // {
+    //     $rate->delete();
 
-        // return new RateResource($rate);
-        return $rate;
-    }
+    //     return new RateResource($rate);
+    // }
 }
