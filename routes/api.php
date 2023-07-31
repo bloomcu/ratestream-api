@@ -8,6 +8,7 @@ use DDD\Http\Columns\ColumnOrderController;
 use DDD\Http\CSV\CSVController;
 use DDD\Http\Rates\RateController;
 use DDD\Http\Rates\RateBatchController;
+use DDD\Http\Rates\RateExportController;
 use DDD\Http\Rates\RateImportController;
 use DDD\Http\Rates\RateUidController;
 
@@ -44,6 +45,11 @@ Route::middleware('auth:sanctum')->group(function() {
     // Rates batch
     Route::prefix('{organization:slug}/rates/batch')->group(function() {
         Route::post('/', [RateBatchController::class, 'handle']);
+    });
+
+    // Rates Export
+    Route::prefix('{organization:slug}/rates/export')->group(function() {
+        Route::post('/', [RateExportController::class, 'export']);
     });
 
     // Rates Import
