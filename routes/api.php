@@ -18,6 +18,11 @@ Route::prefix('{organization:slug}/rates')->group(function() {
     // Route::get('/{rate}', [RateController::class, 'show']);
 });
 
+// Rates Export - Public
+Route::prefix('{organization:slug}/rates/export')->group(function() {
+    Route::get('/', [RateExportController::class, 'export']);
+});
+
 Route::middleware('auth:sanctum')->group(function() {
     // Columns
     Route::prefix('{organization:slug}/columns')->group(function() {
@@ -45,11 +50,6 @@ Route::middleware('auth:sanctum')->group(function() {
     // Rates batch
     Route::prefix('{organization:slug}/rates/batch')->group(function() {
         Route::post('/', [RateBatchController::class, 'handle']);
-    });
-
-    // Rates Export
-    Route::prefix('{organization:slug}/rates/export')->group(function() {
-        Route::post('/', [RateExportController::class, 'export']);
     });
 
     // Rates Import

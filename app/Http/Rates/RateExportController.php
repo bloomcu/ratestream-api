@@ -2,30 +2,20 @@
 
 namespace DDD\Http\Rates;
 
-use Illuminate\Http\Request;
 use DDD\App\Controllers\Controller;
 
 // Models
 use DDD\Domain\Organizations\Organization;
-// use DDD\Domain\Rates\Rate;
-
-// // Requests
-// use DDD\Http\Rates\Requests\RateStoreRequest;
-// use DDD\Http\Rates\Requests\RateUpdateRequest;
-
-// // Resources
-// use DDD\Http\Rates\Resources\RateResource;
-// use DDD\Http\Columns\Resources\ColumnResource;
 
 class RateExportController extends Controller
 {
     public function export(Organization $organization)
     {
-        $columns = $organization->columns;
+        $columns = $organization->columns()->orderBy('order')->get();
         $rows = $organization->rates;
 
         // Setup CSV file
-        $fileName = $organization->slug . '-pages.csv';
+        $fileName = $organization->slug . '-rates.csv';
         $headers = array(
             "Content-type"        => "text/csv",
             "Content-Disposition" => "attachment; filename=$fileName",
@@ -34,33 +24,37 @@ class RateExportController extends Controller
             "Expires"             => "0"
         );
 
-        // // Setup columns
-        // $columns = array(
-        //     'Title',
-        //     'Parents',
-        //     'Url',
-        //     'Category',
-        //     'Wordcount',
-        // );
+        // Setup first row of column uids
+        $columnUids = array('Unique ID');
+        foreach ($columns as $column) {
+            array_push($columnUids, $column->uid);
+        }
+
+        // Setup first row of column uids
+        $columnNames = array('');
+        foreach ($columns as $column) {
+            array_push($columnNames, $column->name);
+        }
 
         // Generate CSV
-        $callback = function() use($columns, $rows) {
+        $callback = function() use($columnUids, $columnNames, $columns, $rows) {
             $file = fopen('php://output', 'w');
+            fputcsv($file, $columnUids);
+            fputcsv($file, $columnNames);
 
-            foreach ($columns as $column) {
-                $row['UID'] = str_replace(chr(194), '', $column->uid);
-                $row['Name'] = str_replace(chr(194), '', $column->name);
-                // $row['Url'] = str_replace(chr(194), '', $page->url);
-                // $row['Category'] = str_replace(chr(194), '', $page->category ? $page->category->title : 'Uncategorized');
-                // $row['Wordcount'] = str_replace(chr(194), '', $page->wordcount);
+            // Output rows and their corresponding columns
+            foreach ($rows as $row) {
+                $line = array();
 
-                fputcsv($file, array(
-                    $row['UID'],
-                    $row['Name'],
-                    // $row['Url'],
-                    // $row['Category'],
-                    // $row['Wordcount'],
-                ));
+                // Add row uid
+                array_push($line, $row->uid);
+
+                // Add row data per current column
+                foreach ($columns as $column) {
+                    array_push($line, $row->data[$column->uid]);
+                }
+
+                fputcsv($file, $line);
             }
 
             fclose($file);
