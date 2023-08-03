@@ -8,13 +8,18 @@ use DDD\Http\Columns\ColumnOrderController;
 use DDD\Http\CSV\CSVController;
 use DDD\Http\Rates\RateController;
 use DDD\Http\Rates\RateBatchController;
-use DDD\Http\Rates\RateImportController;
+use DDD\Http\Rates\RateExportController;
 use DDD\Http\Rates\RateUidController;
 
 // Rates - Public
 Route::prefix('{organization:slug}/rates')->group(function() {
     Route::get('/', [RateController::class, 'index']);
     // Route::get('/{rate}', [RateController::class, 'show']);
+});
+
+// Rates Export - Public
+Route::prefix('{organization:slug}/rates/export')->group(function() {
+    Route::get('/', [RateExportController::class, 'export']);
 });
 
 Route::middleware('auth:sanctum')->group(function() {
@@ -44,11 +49,6 @@ Route::middleware('auth:sanctum')->group(function() {
     // Rates batch
     Route::prefix('{organization:slug}/rates/batch')->group(function() {
         Route::post('/', [RateBatchController::class, 'handle']);
-    });
-
-    // Rates Import
-    Route::prefix('{organization:slug}/rates/import')->group(function() {
-        Route::post('/', [RateImportController::class, 'import']);
     });
 
     // Rates Import
