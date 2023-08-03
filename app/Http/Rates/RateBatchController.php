@@ -22,8 +22,6 @@ class RateBatchController extends Controller
     public function handle(Organization $organization, RateBatchRequest $request)
     {
         // TODO: Validate $request->data includes "Unique ID"?
-        // return $request->validated();
-        // return $request->rates;
 
         // Handle rates\ updates
         foreach ($request->rates as $r) {
