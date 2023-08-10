@@ -4,6 +4,7 @@ namespace DDD\Domain\Rates;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 // Casts
 use DDD\Domain\Rates\Casts\RateData;
@@ -16,7 +17,8 @@ class Rate extends Model
 {
     use HasFactory,
         BelongsToOrganization,
-        BelongsToUser;
+        BelongsToUser,
+        SoftDeletes;
 
     protected $guarded = [
         'id',
