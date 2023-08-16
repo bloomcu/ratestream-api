@@ -28,7 +28,7 @@ class RateBatchController extends Controller
             $uid = $r['uid'];
             unset($r['uid']); // Exclude uid
             
-            $rate = Rate::firstOrCreate(
+            $rate = Rate::withTrashed()->firstOrCreate(
                 [
                     'uid' => $uid,
                     'organization_id' => $organization->id,
@@ -39,11 +39,15 @@ class RateBatchController extends Controller
                 ]
             );
             
-            $rate['data'] = array_merge($rate['data'], $r['data']);
-
+            if ($rate->trashed()) {
+                $rate->restore();
+            }
+            
             if (empty($rate['data'])) {
                 continue;
             }
+
+            $rate['data'] = array_merge($rate['data'], $r['data']);
 
             $rate->save();
         }
