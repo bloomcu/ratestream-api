@@ -33,7 +33,7 @@ class CSVController extends Controller
             return response()->json([
                 'message' => 'There is a problem with this CSV file.',
                 'errors' => [
-                    'uid' => ['The "Unique ID" column is missing in your CSV file.']
+                    'uid' => ['The first value in cell A1 does not contain the term "Unique ID".']
                 ],
             ], 200);
         }
