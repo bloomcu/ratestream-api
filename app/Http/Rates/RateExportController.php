@@ -35,23 +35,29 @@ class RateExportController extends Controller
         foreach ($columns as $column) {
             array_push($columnNames, $column->name);
         }
-
+        
         // Generate CSV
         $callback = function() use($columnUids, $columnNames, $columns, $rows) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columnUids);
             fputcsv($file, $columnNames);
-
+            
             // Output rows and their corresponding columns
             foreach ($rows as $row) {
                 $line = array();
-
+                
                 // Add row uid
                 array_push($line, $row->uid);
-
+                
                 // Add row data per current column
                 foreach ($columns as $column) {
-                    array_push($line, $row->data[$column->uid]);
+                    // Does row has data for this column
+                    if (array_key_exists($column->uid, $row->data)) {
+                        array_push($line, $row->data[$column->uid]);
+                        continue;
+                    }
+
+                    array_push($line, '');
                 }
 
                 fputcsv($file, $line);
