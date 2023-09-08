@@ -8,8 +8,6 @@ use Illuminate\Support\Facades\Storage;
 
 // Vendors
 use League\Csv\Reader;
-use League\Csv\Statement;
-use League\Csv\SyntaxError;
 
 // Models
 use DDD\Domain\Organizations\Organization;
@@ -19,42 +17,39 @@ class CSVController extends Controller
 {
     public function show(Organization $organization, File $file)
     {
-        // Setup CSV
+        // Setup CSV from file
         $csvFile = Storage::get($file->path);
         $csv = Reader::createFromString($csvFile);
-        $csv->setHeaderOffset(0);
+
+        // Check for duplicate headers
+        $header = $csv->fetchOne(0);
+        if (collect($header)->duplicates()->count()) {
+            // TODO: Create an exception class for this
+            return response()->json([
+                'message' => 'There is a problem with this CSV file.',
+                'errors' => [
+                    'uid' => ['The CSV contains duplicate columns using the same Unique ID.']
+                ],
+            ], 200);
+        }
         
-        // Separate header from rows
+        // Setup header and rows
+        // Header: Each column uid as key and column name as value
+        // Rows: Each cell with column uid as key and cell content as value
+        $csv->setHeaderOffset(0);
         $csv = collect($csv);
         $csvHeader = collect($csv[1]);
         $csvRows = collect($csv)->slice(1);
-        
-        // Validate header contains the "Unique ID" columns
+
+        // Validate header contains the top left "Unique ID" column
         if (!$csvHeader->has('Unique ID')) {
             // TODO: Create an exception class for this
             return response()->json([
                 'message' => 'There is a problem with this CSV file.',
                 'errors' => [
-                    'uid' => [
-                        'The "Unique ID" column is missing in your CSV file.'
-                    ]
+                    'uid' => ['The first value in cell A1 does not contain the term "Unique ID".']
                 ],
             ], 200);
-        }
-
-        // Validate all rows have a "Unique ID" column
-        foreach($csvRows as $row) {
-            if (!$row['Unique ID']) {
-                // TODO: Create an exception class for this
-                return response()->json([
-                    'message' => 'There is a problem with this CSV file.',
-                    'errors' => [
-                        'uid' => [
-                            'The "Unique ID" is missing on one or more rows.'
-                        ]
-                    ],
-                ], 200);
-            }
         }
 
         // Remove "Unique ID" header
@@ -69,6 +64,19 @@ class CSVController extends Controller
             ]);
         }
 
+        // Validate all columns have a "Unique ID"
+        foreach($columns as $column) {
+            if (!$column['uid']) {
+                // TODO: Create an exception class for this
+                return response()->json([
+                    'message' => 'There is a problem with this CSV file.',
+                    'errors' => [
+                        'uid' => ['The "Unique ID" is missing on one or more columns.']
+                    ],
+                ], 200);
+            }
+        }
+
         // Collect rows
         $rows = collect();
         foreach($csvRows as $row) {
@@ -79,6 +87,30 @@ class CSVController extends Controller
                 'uid' => $uid,
                 'data' => $row
             ]);
+        }
+
+        // Validate all rows have a "Unique ID" column
+        foreach($rows as $row) {
+            if (!$row['uid']) {
+                // TODO: Create an exception class for this
+                return response()->json([
+                    'message' => 'There is a problem with this CSV file.',
+                    'errors' => [
+                        'uid' => ['The "Unique ID" is missing on one or more rows.']
+                    ],
+                ], 200);
+            }
+        }
+
+        // Check for duplicate rows
+        if ($rows->duplicates('uid')->count()) {
+            // TODO: Create an exception class for this
+            return response()->json([
+                'message' => 'There is a problem with this CSV file.',
+                'errors' => [
+                    'uid' => ['The CSV contains duplicate rows using the same Unique ID.']
+                ],
+            ], 200);
         }
 
         return response()->json([
