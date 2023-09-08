@@ -43,7 +43,7 @@ class RateBatchController extends Controller
                 $rate->restore();
             }
             
-            if (empty($rate['data'])) {
+            if (empty($r['data'])) {
                 continue;
             }
 
