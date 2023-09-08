@@ -28,16 +28,18 @@ class CSVController extends Controller
             return response()->json([
                 'message' => 'There is a problem with this CSV file.',
                 'errors' => [
-                    'uid' => ['The CSV contains duplicate columns using the same Unique ID.']
+                    'uid' => ['Duplicate columns found: The CSV contains duplicate columns using the same Unique ID.']
                 ],
             ], 200);
         }
         
+        // Setup CSV as a Laravel Collection
+        $csv->setHeaderOffset(0);
+        $csv = collect($csv);
+
         // Setup header and rows
         // Header: Each column uid as key and column name as value
         // Rows: Each cell with column uid as key and cell content as value
-        $csv->setHeaderOffset(0);
-        $csv = collect($csv);
         $csvHeader = collect($csv[1]);
         $csvRows = collect($csv)->slice(1);
 
@@ -47,7 +49,7 @@ class CSVController extends Controller
             return response()->json([
                 'message' => 'There is a problem with this CSV file.',
                 'errors' => [
-                    'uid' => ['The first value in cell A1 does not contain the term "Unique ID".']
+                    'uid' => ['Incorrect A1 cell: The first value of the CSV in cell A1 does not contain the term "Unique ID".']
                 ],
             ], 200);
         }
@@ -71,7 +73,20 @@ class CSVController extends Controller
                 return response()->json([
                     'message' => 'There is a problem with this CSV file.',
                     'errors' => [
-                        'uid' => ['The "Unique ID" is missing on one or more columns.']
+                        'uid' => ['Missing column Unique ID: The Unique ID is missing on one or more columns.']
+                    ],
+                ], 200);
+            }
+        }
+
+        // Validate all columns have a "Name"
+        foreach($columns as $column) {
+            if (!$column['name']) {
+                // TODO: Create an exception class for this
+                return response()->json([
+                    'message' => 'There is a problem with this CSV file.',
+                    'errors' => [
+                        'uid' => ['Missing column name: The name is missing for one or more columns in the second row of the CSV.']
                     ],
                 ], 200);
             }
@@ -96,7 +111,7 @@ class CSVController extends Controller
                 return response()->json([
                     'message' => 'There is a problem with this CSV file.',
                     'errors' => [
-                        'uid' => ['The "Unique ID" is missing on one or more rows.']
+                        'uid' => ['Missing row Unique ID: The Unique ID is missing on one or more rows.']
                     ],
                 ], 200);
             }
@@ -108,7 +123,7 @@ class CSVController extends Controller
             return response()->json([
                 'message' => 'There is a problem with this CSV file.',
                 'errors' => [
-                    'uid' => ['The CSV contains duplicate rows using the same Unique ID.']
+                    'uid' => ['Duplicate rows found: The CSV contains rows using the same Unique ID.']
                 ],
             ], 200);
         }
