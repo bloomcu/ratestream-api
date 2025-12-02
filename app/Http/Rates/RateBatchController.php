@@ -19,6 +19,17 @@ use DDD\Http\Rates\Requests\RateBatchRequest;
 
 class RateBatchController extends Controller
 {
+    /**
+     * Process a batch update of rate data for an organization.
+     *
+     * This will upsert rates, merge their payload data, upsert any non-unique ID
+     * columns, and honor delete requests. A JSON response containing the refreshed
+     * rate and column collections is returned for the requesting organization.
+     *
+     * @param Organization $organization
+     * @param RateBatchRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function handle(Organization $organization, RateBatchRequest $request)
     {
         // TODO: Validate $request->data includes "Unique ID"?
