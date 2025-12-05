@@ -22,7 +22,7 @@ Route::prefix('{organization:slug}/rates/export')->group(function() {
     Route::get('/', [RateExportController::class, 'export']);
 });
 
-Route::middleware('auth:sanctum')->group(function() {
+Route::middleware(['auth:sanctum', 'verify.organization.access'])->group(function() {
     // Columns
     Route::prefix('{organization:slug}/columns')->group(function() {
         Route::post('/', [ColumnController::class, 'store']);
