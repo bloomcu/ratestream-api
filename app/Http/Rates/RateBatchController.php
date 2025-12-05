@@ -9,6 +9,7 @@ use DDD\App\Controllers\Controller;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Columns\Column;
 use DDD\Domain\Rates\Rate;
+use DDD\App\Traits\ResolvesRateGroup;
 
 // Resources
 use DDD\Http\Columns\Resources\ColumnResource;
@@ -19,6 +20,8 @@ use DDD\Http\Rates\Requests\RateBatchRequest;
 
 class RateBatchController extends Controller
 {
+    use ResolvesRateGroup;
+
     /**
      * Process a batch update of rate data for an organization.
      *
@@ -34,6 +37,8 @@ class RateBatchController extends Controller
     {
         // TODO: Validate $request->data includes "Unique ID"?
 
+        $rateGroupId = $this->resolveRateGroupId($organization, $request->input('rate_group_id'));
+
         // Handle rates\ updates
         foreach ($request->rates as $r) {
             $uid = $r['uid'];
@@ -47,14 +52,20 @@ class RateBatchController extends Controller
                 [
                     'organization_id' => $organization->id,
                     'user_id' => $request->user()->id,
+                    'rate_group_id' => $rateGroupId,
                 ]
             );
             
             if ($rate->trashed()) {
                 $rate->restore();
             }
+
+            if ($rate->rate_group_id !== $rateGroupId) {
+                $rate->rate_group_id = $rateGroupId;
+            }
             
             if (empty($r['data'])) {
+                $rate->save();
                 continue;
             }
 
@@ -79,8 +90,13 @@ class RateBatchController extends Controller
                     'name' => $c['name'],
                     'organization_id' => $organization->id,
                     'user_id' => $request->user()->id,
+                    'rate_group_id' => $rateGroupId,
                 ]
             );
+
+            if ($column->rate_group_id !== $rateGroupId) {
+                $column->rate_group_id = $rateGroupId;
+            }
 
             $column->save();
         }
@@ -108,4 +124,5 @@ class RateBatchController extends Controller
             ]
         ], 200);
     }
+
 }

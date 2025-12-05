@@ -28,6 +28,7 @@ class ColumnStoreRequest extends FormRequest
         return [
             'name' => 'required|string|unique:columns',
             'order' => 'nullable|integer',
+            'rate_group_id' => 'nullable|integer',
         ];
     }
 

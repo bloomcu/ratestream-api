@@ -26,6 +26,7 @@ class RateBatchRequest extends FormRequest
     public function rules()
     {
         return [
+            'rate_group_id' => 'nullable|integer',
             'rates' => 'array',
             'rates.*' => 'required_array_keys:uid',
 
