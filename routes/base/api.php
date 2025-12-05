@@ -67,7 +67,7 @@ Route::get('/media/{media:uuid}', [MediaDownloadController::class, 'download']);
 //     Route::get('/{site}', [SiteController::class, 'show']);
 // });
 
-Route::middleware('auth:sanctum')->group(function() {
+Route::middleware(['auth:sanctum', 'verify.organization.access'])->group(function() {
     // Auth
     Route::post('auth/logout', AuthLogoutController::class);
     Route::get('auth/me', AuthMeController::class);
