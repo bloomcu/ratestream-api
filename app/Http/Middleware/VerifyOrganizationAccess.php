@@ -2,6 +2,7 @@
 namespace DDD\Http\Middleware;
 
 use Closure;
+use DDD\Domain\Base\Users\Enums\RoleEnum;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -26,6 +27,10 @@ class VerifyOrganizationAccess
 
         // If no organization is in the route, allow the request
         if (!$organization) {
+            return $next($request);
+        }
+
+        if($user->role=== RoleEnum::SuperAdmin){
             return $next($request);
         }
 
