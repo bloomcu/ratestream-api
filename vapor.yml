@@ -1,5 +1,9 @@
 id: 46515
 name: ratestream-api
+ignore:
+    - todo.txt
+    - docker-compose.yml
+    
 environments:
     production:
         memory: 1024
@@ -7,6 +11,7 @@ environments:
         runtime: 'php-8.2:al2'
         database: 'ratestream-api'
         storage: 'ratestream-storage'
+       
         build:
             - 'composer install --no-dev'
             - 'php artisan event:cache'
@@ -19,6 +24,7 @@ environments:
             runtime: 'php-8.2:al2'
             database: 'staging-ratestream-api'
             storage: 'staging-ratestream-storage'
+            
             build:
                 - 'composer install --no-dev'
                 - 'php artisan event:cache'

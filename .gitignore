@@ -14,3 +14,5 @@ yarn-error.log
 **/base/
 .env.staging
 .vapor
+todo.txt
+docker-compose.yml
