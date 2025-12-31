@@ -32,4 +32,7 @@ class RateGroup extends Model
     public function columns() {
         return $this->hasMany('DDD\Domain\Columns\Column', 'rate_group_id');
     }
+    public function revisions() {
+        return $this->hasMany('DDD\Domain\Rates\RateGroup', 'revision_of');
+    }
 }

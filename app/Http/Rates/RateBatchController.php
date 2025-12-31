@@ -17,6 +17,7 @@ use DDD\Http\Rates\Resources\RateResource;
 
 // Requests
 use DDD\Http\Rates\Requests\RateBatchRequest;
+use Illuminate\Support\Facades\Log;
 
 class RateBatchController extends Controller
 {
@@ -36,7 +37,7 @@ class RateBatchController extends Controller
     public function handle(Organization $organization, RateBatchRequest $request)
     {
         // TODO: Validate $request->data includes "Unique ID"?
-
+        
         $rateGroupId = $this->resolveRateGroupId($organization, $request->input('rate_group_id'));
 
         // Handle rates\ updates
@@ -48,6 +49,7 @@ class RateBatchController extends Controller
                 [
                     'uid' => $uid,
                     'organization_id' => $organization->id,
+                    'rate_group_id' => $rateGroupId,
                 ], 
                 [
                     'organization_id' => $organization->id,
@@ -84,6 +86,7 @@ class RateBatchController extends Controller
                 [
                     'uid' => $c['uid'],
                     'organization_id' => $organization->id,
+                    'rate_group_id' => $rateGroupId,
                 ], 
                 [
                     'uid' => $c['uid'],
@@ -103,12 +106,22 @@ class RateBatchController extends Controller
 
         // Handle deletes
         foreach ($request->deletes as $delete) {
+            $record = null;
+
+            $groupId = $this->resolveRateGroupId($organization, $delete['group_id'] ?? null);
+
             if ($delete['model'] === 'rate') {
-                $record = Rate::where('uid', $delete['uid'])->first();
+                $record = Rate::where('uid', $delete['uid'])
+                    ->where('organization_id', $organization->id)
+                    ->where('rate_group_id', $groupId)
+                    ->first();
             }
 
             if ($delete['model'] === 'column') {
-                $record = Column::where('uid', $delete['uid'])->first();
+                $record = Column::where('uid', $delete['uid'])
+                    ->where('organization_id', $organization->id)
+                    ->where('rate_group_id', $groupId)
+                    ->first();
             } 
 
             if ($record) {

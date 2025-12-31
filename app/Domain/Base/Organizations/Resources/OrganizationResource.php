@@ -22,6 +22,7 @@ class OrganizationResource extends JsonResource
             'title' => $this->title,
             'slug' => $this->slug,
             // 'user_count' => $this->userCount(),
+            'default_rate_group_id' => $this->default_rate_group_id,
             'subscribed' => $this->subscribed('default'),
             'ends_at' => optional(optional($this->subscription('default'))->ends_at)->toDateTimeString(),
             'plan' => new PlanResource($this->plan),

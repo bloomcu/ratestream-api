@@ -10,6 +10,9 @@ use DDD\Http\Rates\RateController;
 use DDD\Http\Rates\RateBatchController;
 use DDD\Http\Rates\RateExportController;
 use DDD\Http\Rates\RateUidController;
+use DDD\Http\Rates\RateGroupCloneController;
+use DDD\Http\Rates\RateGroupController;
+use DDD\Http\Rates\RateGroupRevisionController;
 
 // Rates - Public
 Route::prefix('{organization:slug}/rates')->group(function() {
@@ -50,6 +53,13 @@ Route::middleware(['auth:sanctum', 'verify.organization.access'])->group(functio
     Route::prefix('{organization:slug}/rates/batch')->group(function() {
         Route::post('/', [RateBatchController::class, 'handle']);
     });
+
+    // Rate group clone
+    Route::post('{organization:slug}/rate-groups/{rateGroup}/clone', RateGroupCloneController::class);
+
+    // Rate groups
+    Route::get('{organization:slug}/rate-groups', [RateGroupController::class, 'index']);
+    Route::get('{organization:slug}/rate-groups/{rateGroup}/revisions', [RateGroupRevisionController::class, 'index']);
 
     // Rates Import
     Route::prefix('{organization:slug}/rates/uid/update')->group(function() {

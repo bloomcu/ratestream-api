@@ -11,6 +11,8 @@ use Spatie\QueryBuilder\QueryBuilder;
 // Models
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Rates\Rate;
+use DDD\Domain\Columns\Column;
+use DDD\App\Traits\ResolvesRateGroup;
 
 // Requests
 use DDD\Http\Rates\Requests\RateStoreRequest;
@@ -19,17 +21,26 @@ use DDD\Http\Rates\Requests\RateUpdateRequest;
 // Resources
 use DDD\Http\Rates\Resources\RateResource;
 use DDD\Http\Columns\Resources\ColumnResource;
+use Illuminate\Support\Facades\Log;
 
 class RateController extends Controller
 {
-    public function index(Organization $organization)
+    use ResolvesRateGroup;
+
+    public function index(Organization $organization, Request $request)
     {
+        $rateGroupId = $this->resolveRateGroupId($organization, $request->input('rate_group_id'));
+        Log::info("Resolved Rate Group ID: " . $rateGroupId);
         $rates = QueryBuilder::for(Rate::class)
             ->where('organization_id', $organization->id)
+            ->where('rate_group_id', $rateGroupId)
             ->allowedFilters(['uid', 'data->rate'])
             ->get();
 
-        $columns = $organization->columns()->orderBy('order')->get();
+        $columns = Column::where('organization_id', $organization->id)
+            ->where('rate_group_id', $rateGroupId)
+            ->orderBy('order')
+            ->get();
 
         return [
             'columns' => ColumnResource::collection($columns),
