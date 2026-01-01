@@ -24,6 +24,7 @@ class RateGroupController extends Controller
                 'rates',
             ])
             ->where('organization_id', $organization->id)
+            ->whereNull('archived_at')
             
             ->orderBy('position')
             ->get();
