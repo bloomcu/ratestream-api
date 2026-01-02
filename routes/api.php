@@ -14,6 +14,7 @@ use DDD\Http\Rates\RateGroupCloneController;
 use DDD\Http\Rates\RateGroupController;
 use DDD\Http\Rates\RateGroupRevisionController;
 use DDD\Http\Rates\RateGroupPublishController;
+use DDD\Http\Rates\RateScheduleController;
 
 // Rates - Public
 Route::prefix('{organization:slug}/rates')->group(function() {
@@ -58,6 +59,7 @@ Route::middleware(['auth:sanctum', 'verify.organization.access'])->group(functio
     // Rate group clone
     Route::post('{organization:slug}/rate-groups/{rateGroup}/clone', RateGroupCloneController::class);
     Route::post('{organization:slug}/rate-groups/{rateGroup}/publish', RateGroupPublishController::class);
+    Route::post('{organization:slug}/rate-groups/{rateGroup}/schedule', RateScheduleController::class);
 
     // Rate groups
     Route::get('{organization:slug}/rate-groups', [RateGroupController::class, 'index']);
