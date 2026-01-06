@@ -9,6 +9,7 @@ use DDD\Http\Columns\Resources\ColumnResource;
 use DDD\Http\Rates\Resources\RateGroupResource;
 use DDD\Http\Rates\Resources\RateResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class RateScheduleController extends Controller
 {
@@ -34,7 +35,7 @@ class RateScheduleController extends Controller
             'published_at' => ['required', 'date'],
         ]);
 
-        $rateGroup->published_at = $validated['published_at'];
+        $rateGroup->published_at = Carbon::parse($validated['published_at'])->utc();
         $rateGroup->save();
 
         $rateGroup->load([

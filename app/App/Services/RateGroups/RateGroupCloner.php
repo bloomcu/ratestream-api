@@ -50,8 +50,7 @@ class RateGroupCloner
             }
 
             // Clone rates
-            $sourceRates = Rate::withTrashed()
-                ->where('organization_id', $organization->id)
+            $sourceRates = Rate::where('organization_id', $organization->id)
                 ->where('rate_group_id', $sourceGroup->id)
                 ->get();
 

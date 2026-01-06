@@ -9,6 +9,7 @@ use  DDD\App\Services\RateGroups\RateGroupCloner;
 use DDD\Http\Columns\Resources\ColumnResource;
 use DDD\Http\Rates\Resources\RateGroupResource;
 use DDD\Http\Rates\Resources\RateResource;
+use Illuminate\Support\Facades\Log;
 
 class RateGroupCloneController extends Controller
 {
@@ -26,19 +27,22 @@ class RateGroupCloneController extends Controller
         if ($rateGroup->organization_id !== $organization->id) {
             abort(422, 'Rate group does not belong to this organization.');
         }
-
+        
+        Log::info('RateGroup to be cloned', ['rate_group_id' => $rateGroup->id, 'rate_group' => $rateGroup]);
         $newGroup = $cloner->cloneAsDraft($organization, $rateGroup);
         $newGroup->load([
             'columns' => fn ($query) => $query->orderBy('order'),
             'rates',
         ]);
 
-        return response()->json([
+        $clonedGroup = [
             'message' => 'Rate group cloned.',
             'group' => new RateGroupResource($newGroup),
             'columns' => ColumnResource::collection($newGroup->columns),
             'rates' => RateResource::collection($newGroup->rates),
-        ], 201);
+        ];
+        Log::info('Cloned RateGroup', ['cloned_group' => $clonedGroup]);
+        return response()->json($clonedGroup, 201);
 
         
     }

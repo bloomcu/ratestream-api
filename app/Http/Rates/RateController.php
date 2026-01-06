@@ -29,6 +29,7 @@ class RateController extends Controller
 
     public function index(Organization $organization, Request $request)
     {
+        Log::info('RateController index invoked', ['request_data' => $request->all()]); 
         $rateGroupId = $this->resolveRateGroupId($organization, $request->input('rate_group_id'));
         Log::info("Resolved Rate Group ID: " . $rateGroupId);
         $rates = QueryBuilder::for(Rate::class)
