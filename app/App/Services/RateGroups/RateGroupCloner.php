@@ -27,7 +27,7 @@ class RateGroupCloner
             $newGroup = RateGroup::create([
                 'organization_id' => $organization->id,
                 'user_id' => $sourceGroup->user_id,
-                'title' => $sourceGroup->title . ' Copy',
+                'title' => $sourceGroup->title,
                 'published_at' => null,
                 'revision_of' => $sourceGroup->id,
                 'position' => $sourceGroup->position,
