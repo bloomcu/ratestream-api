@@ -10,9 +10,12 @@ use DDD\Domain\Base\Organizations\Organization;
 
 // Resources
 use DDD\Domain\Base\Organizations\Resources\OrganizationResource;
+use DDD\App\Traits\EnsuresDefaultRateGroup;
 
 class OrganizationController extends Controller
 {
+    use EnsuresDefaultRateGroup;
+
     /**
      * Display a listing of the resource.
      */
@@ -29,6 +32,9 @@ class OrganizationController extends Controller
     public function store(Request $request)
     {
         $organization = Organization::create($request->all());
+
+        // Ensure a default rate group exists for the new organization
+        $this->ensureDefaultRateGroup($organization, null);
 
         return new OrganizationResource($organization);
     }
