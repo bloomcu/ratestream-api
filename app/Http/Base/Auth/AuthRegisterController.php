@@ -10,6 +10,7 @@ use DDD\App\Controllers\Controller;
 // Models
 use DDD\Domain\Base\Organizations\Organization;
 use DDD\Domain\Base\Users\User;
+use DDD\App\Traits\EnsuresDefaultRateGroup;
 
 // Requests
 use DDD\Http\Base\Auth\Requests\AuthRegisterRequest;
@@ -19,6 +20,8 @@ use DDD\Domain\Base\Organizations\Resources\OrganizationResource;
 
 class AuthRegisterController extends Controller
 {
+    use EnsuresDefaultRateGroup;
+
     public function __invoke(AuthRegisterRequest $request)
     {
         $organization = Organization::create([
@@ -32,6 +35,8 @@ class AuthRegisterController extends Controller
             'organization_id' => $organization->id,
             'password' => Hash::make($request->password),
         ]);
+
+        $this->ensureDefaultRateGroup($organization, $user->id);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

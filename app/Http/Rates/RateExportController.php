@@ -2,17 +2,29 @@
 
 namespace DDD\Http\Rates;
 
+use Illuminate\Http\Request;
 use DDD\App\Controllers\Controller;
+use DDD\App\Traits\ResolvesRateGroup;
 
 // Models
+use DDD\Domain\Columns\Column;
 use DDD\Domain\Organizations\Organization;
+use DDD\Domain\Rates\Rate;
 
 class RateExportController extends Controller
 {
-    public function export(Organization $organization)
+    use ResolvesRateGroup;
+
+    public function export(Organization $organization, Request $request)
     {
-        $columns = $organization->columns()->orderBy('order')->get();
-        $rows = $organization->rates;
+        $rateGroupId = $this->resolveRateGroupId($organization, $request->input('rate_group_id'));
+        $columns = Column::where('organization_id', $organization->id)
+            ->where('rate_group_id', $rateGroupId)
+            ->orderBy('order')
+            ->get();
+        $rows = Rate::where('organization_id', $organization->id)
+            ->where('rate_group_id', $rateGroupId)
+            ->get();
 
         // Setup CSV file
         $fileName = $organization->slug . '-rates.csv';

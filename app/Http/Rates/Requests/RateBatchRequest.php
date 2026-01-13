@@ -26,6 +26,7 @@ class RateBatchRequest extends FormRequest
     public function rules()
     {
         return [
+            'rate_group_id' => 'nullable|integer',
             'rates' => 'array',
             'rates.*' => 'required_array_keys:uid',
 
@@ -34,7 +35,9 @@ class RateBatchRequest extends FormRequest
             'columns.*' => 'required_array_keys:name',
 
             'deletes' => 'array',
-            // 'deletes.*' => 'required_array_keys:uid',
+            'deletes.*' => 'required_array_keys:uid,model,group_id',
+            'deletes.*.group_id' => 'integer',
+            'deletes.*.model' => 'in:rate,column',
         ];
     }
 
