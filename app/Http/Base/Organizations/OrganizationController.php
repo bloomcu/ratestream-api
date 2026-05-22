@@ -52,7 +52,10 @@ class OrganizationController extends Controller
      */
     public function update(Organization $organization, Request $request)
     {
-        $organization->update($request->all());
+        $organization->update($request->only([
+            'title',
+            'rates_domain',
+        ]));
 
         return new OrganizationResource($organization);
     }
