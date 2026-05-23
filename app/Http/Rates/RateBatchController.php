@@ -137,11 +137,20 @@ class RateBatchController extends Controller
             SyncPublishedRatesToWebsite::dispatch($organization->id, $rateGroup->id);
         }
 
+        $rates = Rate::where('organization_id', $organization->id)
+            ->where('rate_group_id', $rateGroupId)
+            ->get();
+
+        $columns = Column::where('organization_id', $organization->id)
+            ->where('rate_group_id', $rateGroupId)
+            ->orderBy('order')
+            ->get();
+
         return response()->json([
             'message' => 'Rate batch handeled',
             'data' => [
-                'rates' => RateResource::collection($organization->rates),
-                'columns' => ColumnResource::collection($organization->columns),
+                'rates' => RateResource::collection($rates),
+                'columns' => ColumnResource::collection($columns),
             ]
         ], 200);
     }
