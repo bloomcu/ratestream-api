@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up()
     {
+        if ($this->isSqlite()) {
+            return;
+        }
+
         if (Schema::hasColumn('rates', 'rate_group_id')) {
             Schema::table('rates', function (Blueprint $table) {
                 $table->dropForeign(['rate_group_id']);
@@ -31,6 +35,10 @@ return new class extends Migration
 
     public function down()
     {
+        if ($this->isSqlite()) {
+            return;
+        }
+
         if (Schema::hasColumn('rates', 'rate_group_id')) {
             Schema::table('rates', function (Blueprint $table) {
                 $table->dropForeign(['rate_group_id']);
@@ -48,5 +56,10 @@ return new class extends Migration
                     ->on('rate_groups');
             });
         }
+    }
+
+    private function isSqlite(): bool
+    {
+        return Schema::getConnection()->getDriverName() === 'sqlite';
     }
 };

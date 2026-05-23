@@ -2,6 +2,7 @@
 
 namespace DDD\App\Services\RateGroups;
 
+use DDD\App\Jobs\SyncPublishedRatesToWebsite;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Rates\RateGroup;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +26,7 @@ class RateGroupPublisher
             abort(422, 'Only revisions can be published.');
         }
 
-        return DB::transaction(function () use ($organization, $revision) {
+        $publishedGroup = DB::transaction(function () use ($organization, $revision) {
             $originalGroup = RateGroup::where('id', $revision->revision_of)
                 ->where('organization_id', $organization->id)
                 ->first();
@@ -49,5 +50,9 @@ class RateGroupPublisher
 
             return $revision->fresh();
         });
+
+        SyncPublishedRatesToWebsite::dispatch($organization->id, $publishedGroup->id);
+
+        return $publishedGroup;
     }
 }
