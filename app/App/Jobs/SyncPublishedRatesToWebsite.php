@@ -16,8 +16,6 @@ class SyncPublishedRatesToWebsite implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private const SECRET = 'test-secret';
-
     public int $tries = 3;
 
     public int $timeout = 10;
@@ -58,11 +56,22 @@ class SyncPublishedRatesToWebsite implements ShouldQueue
             return;
         }
 
+        $syncKey = trim((string) $organization->rates_sync_key);
+
+        if ($syncKey === '') {
+            Log::warning('Published rates webhook skipped: missing rates sync key.', [
+                'organization_id' => $organization->id,
+                'published_rate_group_id' => $this->publishedRateGroupId,
+            ]);
+
+            return;
+        }
+
         try {
             $response = Http::asJson()
                 ->timeout(5)
                 ->withHeaders([
-                    'X-RateStream-Secret' => self::SECRET,
+                    'X-RateStream-Secret' => $syncKey,
                 ])
                 ->post($url, []);
         } catch (Throwable $exception) {

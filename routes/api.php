@@ -15,6 +15,7 @@ use DDD\Http\Rates\RateGroupController;
 use DDD\Http\Rates\RateGroupRevisionController;
 use DDD\Http\Rates\RateGroupPublishController;
 use DDD\Http\Rates\RateScheduleController;
+use DDD\Http\Rates\RateSyncKeyController;
 
 // Rates - Public
 Route::prefix('{organization:slug}/rates')->group(function() {
@@ -54,6 +55,12 @@ Route::middleware(['auth:sanctum', 'verify.organization.access'])->group(functio
     // Rates batch
     Route::prefix('{organization:slug}/rates/batch')->group(function() {
         Route::post('/', [RateBatchController::class, 'handle']);
+    });
+
+    // Rates sync key
+    Route::middleware('organization.admin')->group(function() {
+        Route::get('{organization:slug}/rates/sync-key', [RateSyncKeyController::class, 'show']);
+        Route::post('{organization:slug}/rates/sync-key/rotate', [RateSyncKeyController::class, 'rotate']);
     });
 
     // Rate group clone

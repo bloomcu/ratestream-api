@@ -25,7 +25,7 @@ class SyncPublishedRatesToWebsiteTest extends TestCase
         Http::assertSent(function ($request) {
             return $request->url() === 'https://example.com/wp-json/ratestream/v1/sync'
                 && $request->method() === 'POST'
-                && $request->hasHeader('X-RateStream-Secret', 'test-secret');
+                && $request->hasHeader('X-RateStream-Secret', 'org-sync-key');
         });
     }
 
@@ -42,7 +42,7 @@ class SyncPublishedRatesToWebsiteTest extends TestCase
 
         Http::assertSent(function ($request) {
             return $request->url() === 'http://localhost:8080/wp-json/ratestream/v1/sync'
-                && $request->hasHeader('X-RateStream-Secret', 'test-secret');
+                && $request->hasHeader('X-RateStream-Secret', 'org-sync-key');
         });
     }
 
@@ -58,11 +58,24 @@ class SyncPublishedRatesToWebsiteTest extends TestCase
         Http::assertNothingSent();
     }
 
-    private function publishedGroup(?string $ratesDomain): array
+    /** @test */
+    public function it_skips_the_request_when_the_organization_has_no_rates_sync_key()
+    {
+        Http::fake();
+
+        [$organization, $publishedGroup] = $this->publishedGroup('example.com', null);
+
+        (new SyncPublishedRatesToWebsite($organization->id, $publishedGroup->id))->handle();
+
+        Http::assertNothingSent();
+    }
+
+    private function publishedGroup(?string $ratesDomain, ?string $ratesSyncKey = 'org-sync-key'): array
     {
         $organization = Organization::create([
             'title' => 'Acme Credit Union',
             'rates_domain' => $ratesDomain,
+            'rates_sync_key' => $ratesSyncKey,
         ]);
 
         $user = User::create([
