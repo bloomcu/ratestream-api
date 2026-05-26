@@ -94,6 +94,17 @@ class RateSyncKeyControllerTest extends TestCase
     }
 
     /** @test */
+    public function user_without_a_role_cannot_manage_the_rates_sync_key()
+    {
+        [$organization, $userWithoutRole] = $this->organizationWithUser(null);
+
+        $response = $this->actingAs($userWithoutRole, 'sanctum')
+            ->getJson("/api/{$organization->slug}/rates/sync-key");
+
+        $response->assertForbidden();
+    }
+
+    /** @test */
     public function admin_from_another_organization_cannot_manage_the_rates_sync_key()
     {
         [$organization] = $this->organizationWithUser('admin');
@@ -105,7 +116,7 @@ class RateSyncKeyControllerTest extends TestCase
         $response->assertForbidden();
     }
 
-    private function organizationWithUser(string $role, array $organizationAttributes = []): array
+    private function organizationWithUser(?string $role, array $organizationAttributes = []): array
     {
         $uid = uniqid();
 
