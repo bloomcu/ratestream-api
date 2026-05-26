@@ -7,6 +7,7 @@ use DDD\App\Controllers\Controller;
 
 // Models
 use DDD\Domain\Base\Organizations\Organization;
+use DDD\Domain\Base\Users\Enums\RoleEnum;
 use DDD\Domain\Base\Users\User;
 
 // Resources
@@ -33,10 +34,15 @@ class UserController extends Controller
     //     return response()->json($user);
     // }
 
-    // public function destroy(Organization $organization, User $user)
-    // {
-    //     $user->delete();
-    //
-    //     return new UserResource($user);
-    // }
+    public function destroy(Organization $organization, User $user)
+    {
+        if (auth()->user()->role !== RoleEnum::SuperAdmin && $user->organization_id !== $organization->id) {
+            abort(404);
+        }
+
+        $user->tokens()->delete();
+        $user->delete();
+
+        return new UserResource($user);
+    }
 }
