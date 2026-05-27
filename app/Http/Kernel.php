@@ -3,6 +3,7 @@
 namespace DDD\Http;
 
 use DDD\Http\Middleware\VerifyOrganizationAccess;
+use DDD\Http\Middleware\EnsureOrganizationAdmin;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -67,5 +68,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'verify.organization.access' => VerifyOrganizationAccess::class,
+        'organization.admin' => EnsureOrganizationAdmin::class,
     ];
 }

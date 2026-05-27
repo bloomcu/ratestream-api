@@ -18,6 +18,9 @@ class CSVController extends Controller
     public function show(Organization $organization, File $file)
     {
         // Setup CSV from file
+        if ($file->organization_id !== $organization->id) {
+            abort(404);
+        }
         $csvFile = Storage::get($file->path);
         $csv = Reader::createFromString($csvFile);
 

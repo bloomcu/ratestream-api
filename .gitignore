@@ -11,8 +11,9 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
-**/base/
+
 .env.staging
 .vapor
 todo.txt
+TODO.md
 docker-compose.yml

@@ -2,13 +2,14 @@
 
 namespace DDD\Http\Rates;
 
-use Illuminate\Http\Request;
 use DDD\App\Controllers\Controller;
 
 // Models
+use DDD\App\Jobs\SyncPublishedRatesToWebsite;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Columns\Column;
 use DDD\Domain\Rates\Rate;
+use DDD\Domain\Rates\RateGroup;
 use DDD\App\Traits\ResolvesRateGroup;
 
 // Resources
@@ -17,7 +18,6 @@ use DDD\Http\Rates\Resources\RateResource;
 
 // Requests
 use DDD\Http\Rates\Requests\RateBatchRequest;
-use Illuminate\Support\Facades\Log;
 
 class RateBatchController extends Controller
 {
@@ -129,13 +129,36 @@ class RateBatchController extends Controller
             }
         }
 
+        $rateGroup = RateGroup::where('id', $rateGroupId)
+            ->where('organization_id', $organization->id)
+            ->first();
+
+        if ($rateGroup && $this->shouldSyncPublishedRates($organization, $rateGroup)) {
+            SyncPublishedRatesToWebsite::dispatch($organization->id, $rateGroup->id);
+        }
+
+        $rates = Rate::where('organization_id', $organization->id)
+            ->where('rate_group_id', $rateGroupId)
+            ->get();
+
+        $columns = Column::where('organization_id', $organization->id)
+            ->where('rate_group_id', $rateGroupId)
+            ->orderBy('order')
+            ->get();
+
         return response()->json([
             'message' => 'Rate batch handeled',
             'data' => [
-                'rates' => RateResource::collection($organization->rates),
-                'columns' => ColumnResource::collection($organization->columns),
+                'rates' => RateResource::collection($rates),
+                'columns' => ColumnResource::collection($columns),
             ]
         ], 200);
     }
 
+    private function shouldSyncPublishedRates(Organization $organization, RateGroup $rateGroup): bool
+    {
+        return (int) $organization->default_rate_group_id === (int) $rateGroup->id
+            && is_null($rateGroup->revision_of)
+            && is_null($rateGroup->archived_at);
+    }
 }

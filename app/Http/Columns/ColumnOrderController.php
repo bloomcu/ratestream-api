@@ -19,6 +19,9 @@ class ColumnOrderController extends Controller
 {
     public function update(Organization $organization, Column $column, ColumnOrderUpdateRequest $request)
     {
+        if ($column->organization_id !== $organization->id) {
+            abort(404);
+        }
         $column->reorder($request->order);
 
         return ColumnResource::collection($organization->columns);

@@ -21,6 +21,7 @@ class OrganizationResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'slug' => $this->slug,
+            'rates_domain' => $this->rates_domain,
             // 'user_count' => $this->userCount(),
             'default_rate_group_id' => $this->default_rate_group_id,
             'subscribed' => $this->subscribed('default'),

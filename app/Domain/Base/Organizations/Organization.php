@@ -28,6 +28,10 @@ class Organization extends Model
 
     protected $guarded = ['id', 'slug'];
 
+    protected $casts = [
+        'rates_sync_key' => 'encrypted',
+    ];
+
     /**
      * Users associated with the organization.
      *
