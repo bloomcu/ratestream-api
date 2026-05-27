@@ -14,10 +14,10 @@ use DDD\Http\Base\Categories\CategoryController;
 use DDD\Http\Base\Files\FileController;
 use DDD\Http\Base\Files\FileDownloadController;
 use DDD\Http\Base\Invitations\InvitationController;
-use DDD\Http\Base\Media\MediaController;
-use DDD\Http\Base\Media\MediaDownloadController;
+// use DDD\Http\Base\Media\MediaController;
+// use DDD\Http\Base\Media\MediaDownloadController;
 use DDD\Http\Base\Organizations\OrganizationController;
-use DDD\Http\Base\Organizations\OrganizationCommentController;
+// use DDD\Http\Base\Organizations\OrganizationCommentController;
 use DDD\Http\Base\Sites\SiteController;
 use DDD\Http\Base\Statuses\StatusController;
 use DDD\Http\Base\Subscriptions\Intent\IntentController;
@@ -39,9 +39,9 @@ Route::post('auth/password/reset', AuthPasswordResetController::class);
 Route::get('{organization:slug}/invitations/{invitation:uuid}', [InvitationController::class, 'show']);
 
 // Public - Organization - Comments
-Route::prefix('/organizations/{organization:slug}')->group(function() {
-    Route::get('/comments', [OrganizationCommentController::class, 'index']);
-});
+// Route::prefix('/organizations/{organization:slug}')->group(function() {
+//     Route::get('/comments', [OrganizationCommentController::class, 'index']);
+// });
 
 // Public - Files
 Route::prefix('/{organization:slug}')->group(function() {
@@ -53,13 +53,13 @@ Route::prefix('/{organization:slug}')->group(function() {
 Route::get('/files/{file}', [FileDownloadController::class, 'download']);
 
 // Public - Media
-Route::prefix('/{organization:slug}')->group(function() {
-    Route::get('/media', [MediaController::class, 'index']);
-    Route::get('/media/{media}', [MediaController::class, 'show']);
-});
+// Route::prefix('/{organization:slug}')->group(function() {
+//     Route::get('/media', [MediaController::class, 'index']);
+//     Route::get('/media/{media}', [MediaController::class, 'show']);
+// });
 
 // Public - Media Download
-Route::get('/media/{media:uuid}', [MediaDownloadController::class, 'download']);
+// Route::get('/media/{media:uuid}', [MediaDownloadController::class, 'download']);
 
 // TODO: CREATE AN ENDPOINT FOR LAUNCH DASHBOARD
 // Public - Sites
@@ -97,10 +97,10 @@ Route::middleware(['auth:sanctum', 'verify.organization.access'])->group(functio
         });
 
         // Media
-        Route::prefix('media')->group(function() {
-            Route::post('/', [MediaController::class, 'store']);
-            Route::delete('/{media}', [MediaController::class, 'destroy']);
-        });
+        // Route::prefix('media')->group(function() {
+        //     Route::post('/', [MediaController::class, 'store']);
+        //     Route::delete('/{media}', [MediaController::class, 'destroy']);
+        // });
 
         // Sites
         Route::prefix('sites')->group(function() {
@@ -137,10 +137,10 @@ Route::middleware(['auth:sanctum', 'verify.organization.access'])->group(functio
     Route::delete('organizations/{organization:slug}', [OrganizationController::class, 'destroy']);
 
     // Organization - Comments
-    Route::prefix('/organizations/{organization:slug}')->group(function() {
-        Route::post('/comments', [OrganizationCommentController::class, 'store']);
-        Route::delete('comments/{comment}', [OrganizationCommentController::class, 'destroy']);
-    });
+    // Route::prefix('/organizations/{organization:slug}')->group(function() {
+    //     Route::post('/comments', [OrganizationCommentController::class, 'store']);
+    //     Route::delete('comments/{comment}', [OrganizationCommentController::class, 'destroy']);
+    // });
 
     // Categories
     Route::prefix('categories')->group(function() {
