@@ -123,6 +123,9 @@ Route::middleware(['auth:sanctum', 'verify.organization.access'])->group(functio
         // Users
         Route::prefix('users')->group(function() {
             Route::get('/', [UserController::class, 'index']);
+            Route::patch('/{user}/role', [UserController::class, 'updateRole'])
+                ->withoutScopedBindings()
+                ->middleware('organization.admin');
             Route::delete('/{user}', [UserController::class, 'destroy'])
                 ->withoutScopedBindings()
                 ->middleware('organization.admin');
