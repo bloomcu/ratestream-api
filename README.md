@@ -92,6 +92,23 @@ Header Key: Authorization
 Header Value: Bearer YOUR_PLAINTEXT_TOKEN
 ```
 
+### Rate Publication and Website Sync
+
+Website syncs are triggered by publication events. When a rate group revision is published, the API queues `SyncPublishedRatesToWebsite`, which posts to the configured organization's rates website webhook.
+
+Publication can happen in three ways:
+
+- **Immediate publication:** publishing a revision immediately triggers a website sync after the revision becomes the organization's published/default rate group.
+- **Scheduled publication:** scheduled revisions are checked once per minute by Laravel's scheduler. When a revision's `published_at` time is due, `PublishScheduledRateGroups` publishes it, then the same publication flow queues the website sync. Scheduled changes should therefore sync within about one minute of the scheduled publish time, plus normal queue/runtime delay.
+- **Edits to the current published group:** batch edits to the organization's current published/default rate group queue a website sync immediately after the save.
+
+For scheduled publication and website syncs to run in an environment, both the Laravel scheduler and queue worker must be active:
+
+```
+php artisan schedule:work
+php artisan queue:work
+```
+
 ### API Endpoints
 
 [WIP] - API endpoints.
