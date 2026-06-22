@@ -8,7 +8,7 @@ environments:
     production:
         memory: 1024
         cli-memory: 512
-        runtime: 'php-8.2:al2'
+        runtime: 'php-8.3:al2023'
         database: 'ratestream-api'
         storage: 'ratestream-storage'
        
@@ -21,7 +21,7 @@ environments:
     staging:
             memory: 1024
             cli-memory: 512
-            runtime: 'php-8.2:al2'
+            runtime: 'php-8.3:al2023'
             database: 'staging-ratestream-api'
             storage: 'staging-ratestream-storage'
             
