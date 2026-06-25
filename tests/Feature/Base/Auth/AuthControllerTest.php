@@ -2,13 +2,28 @@
 
 namespace Tests\Feature\Base\Auth;
 
-use DDD\Domain\Base\Users\User;
+use DDD\Domain\Base\Invitations\Invitation;
 use DDD\Domain\Base\Subscriptions\Plans\Plan;
+use DDD\Domain\Base\Users\User;
 use DDD\Domain\Organizations\Organization;
+use DDD\Domain\Rates\RateGroup;
+use Illuminate\Contracts\Validation\UncompromisedVerifier;
 use Tests\TestCase;
 
 class AuthControllerTest extends TestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->app->instance(UncompromisedVerifier::class, new class implements UncompromisedVerifier {
+            public function verify($data)
+            {
+                return true;
+            }
+        });
+    }
+
     /** @test */
     public function user_can_login_with_valid_credentials_and_receives_a_sanctum_token()
     {
@@ -122,20 +137,157 @@ class AuthControllerTest extends TestCase
         ]);
     }
 
+    /** @test */
+    public function user_can_register_ensure_a_default_rate_group_use_the_returned_token_logout_and_login_again()
+    {
+        $this->ensureFreePlan();
+
+        $password = 'R@teStream-' . uniqid() . '-Aa1!';
+        $email = 'new-user-' . uniqid() . '@example.com';
+        $organizationTitle = 'New Credit Union ' . uniqid();
+        $rateGroupCountBeforeRegistration = RateGroup::count();
+
+        $registerResponse = $this->postJson('/api/auth/register', [
+            'name' => 'New User',
+            'email' => $email,
+            'organization_title' => $organizationTitle,
+            'password' => $password,
+            'password_confirmation' => $password,
+        ]);
+
+        $registerResponse->assertOk()
+            ->assertJsonPath('message', 'Registration successful')
+            ->assertJsonPath('data.name', 'New User')
+            ->assertJsonPath('data.email', $email)
+            ->assertJsonPath('data.role', 'admin')
+            ->assertJsonPath('data.organization.title', $organizationTitle)
+            ->assertJsonStructure([
+                'data' => [
+                    'access_token',
+                    'organization' => [
+                        'id',
+                        'default_rate_group_id',
+                    ],
+                ],
+            ]);
+
+        $user = User::where('email', $email)->firstOrFail();
+        $organization = Organization::where('title', $organizationTitle)->firstOrFail();
+        $defaultRateGroup = RateGroup::findOrFail($organization->default_rate_group_id);
+        $registrationToken = $registerResponse->json('data.access_token');
+
+        $this->assertSame($organization->id, $user->organization_id);
+        $this->assertSame('admin', $user->role->value);
+        $this->assertSame($organization->id, $defaultRateGroup->organization_id);
+        $this->assertSame($user->id, $defaultRateGroup->user_id);
+        $this->assertSame('Default', $defaultRateGroup->title);
+        $this->assertNotNull($defaultRateGroup->published_at);
+        $this->assertSame($rateGroupCountBeforeRegistration + 1, RateGroup::count());
+        $this->assertDatabaseCount('personal_access_tokens', 1);
+
+        $this->withHeader('Authorization', 'Bearer ' . $registrationToken)
+            ->getJson('/api/auth/me')
+            ->assertOk()
+            ->assertJsonPath('data.id', $user->id)
+            ->assertJsonPath('data.email', $email);
+
+        $this->withHeader('Authorization', 'Bearer ' . $registrationToken)
+            ->postJson('/api/auth/logout')
+            ->assertOk()
+            ->assertJsonPath('message', 'Tokens Revoked');
+
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+        $this->flushHeaders();
+        $this->app['auth']->forgetGuards();
+        $this->app['auth']->shouldUse('web');
+
+        $loginResponse = $this->postJson('/api/auth/login', [
+            'email' => $email,
+            'password' => $password,
+        ]);
+
+        $loginResponse->assertOk()
+            ->assertJsonPath('message', 'Login successful')
+            ->assertJsonPath('data.email', $email)
+            ->assertJsonPath('data.role', 'admin')
+            ->assertJsonPath('data.organization.id', $organization->id);
+
+        $loginToken = $loginResponse->json('data.access_token');
+
+        $this->assertNotSame($registrationToken, $loginToken);
+        $this->assertDatabaseCount('personal_access_tokens', 1);
+
+        $this->withHeader('Authorization', 'Bearer ' . $loginToken)
+            ->getJson('/api/auth/me')
+            ->assertOk()
+            ->assertJsonPath('data.id', $user->id);
+
+        $this->flushSession();
+        $this->app['auth']->forgetGuards();
+
+        $this->withHeader('Authorization', 'Bearer ' . $registrationToken)
+            ->getJson('/api/auth/me')
+            ->assertUnauthorized();
+    }
+
+    /** @test */
+    public function registration_rejects_an_existing_user_email()
+    {
+        [, $existingUser] = $this->organizationWithUser('admin');
+        $password = 'R@teStream-' . uniqid() . '-Aa1!';
+
+        $response = $this->postJson('/api/auth/register', [
+            'name' => 'Duplicate User',
+            'email' => $existingUser->email,
+            'organization_title' => 'Duplicate Credit Union',
+            'password' => $password,
+            'password_confirmation' => $password,
+        ]);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors('email');
+
+        $this->assertDatabaseCount('organizations', 1);
+        $this->assertDatabaseCount('users', 1);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+    }
+
+    /** @test */
+    public function registration_rejects_an_email_with_a_pending_invitation()
+    {
+        [$organization, $invitingUser] = $this->organizationWithUser('admin');
+        $email = 'invited-' . uniqid() . '@example.com';
+        $password = 'R@teStream-' . uniqid() . '-Aa1!';
+
+        Invitation::create([
+            'organization_id' => $organization->id,
+            'user_id' => $invitingUser->id,
+            'email' => $email,
+            'role' => 'editor',
+        ]);
+
+        $response = $this->postJson('/api/auth/register', [
+            'name' => 'Invited User',
+            'email' => $email,
+            'organization_title' => 'Invited Credit Union',
+            'password' => $password,
+            'password_confirmation' => $password,
+        ]);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors('email');
+
+        $this->assertDatabaseCount('organizations', 1);
+        $this->assertDatabaseCount('users', 1);
+        $this->assertDatabaseCount('invitations', 1);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+    }
+
     private function organizationWithUser(?string $role): array
     {
         $uid = uniqid();
 
-        Plan::firstOrCreate(
-            ['buyable' => false],
-            [
-                'title' => 'Free',
-                'slug' => 'free',
-                'price' => 0,
-                'interval' => null,
-                'limits' => [],
-            ]
-        );
+        $this->ensureFreePlan();
 
         $organization = Organization::create([
             'title' => 'Acme Credit Union ' . $uid,
@@ -151,5 +303,19 @@ class AuthControllerTest extends TestCase
         ]);
 
         return [$organization, $user];
+    }
+
+    private function ensureFreePlan(): void
+    {
+        Plan::firstOrCreate(
+            ['buyable' => false],
+            [
+                'title' => 'Free',
+                'slug' => 'free',
+                'price' => 0,
+                'interval' => null,
+                'limits' => [],
+            ]
+        );
     }
 }
