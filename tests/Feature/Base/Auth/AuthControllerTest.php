@@ -8,6 +8,8 @@ use DDD\Domain\Base\Users\User;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Rates\RateGroup;
 use Illuminate\Contracts\Validation\UncompromisedVerifier;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Tests\TestCase;
 
 class AuthControllerTest extends TestCase
@@ -268,6 +270,86 @@ class AuthControllerTest extends TestCase
         $this->withHeader('Authorization', 'Bearer ' . $registrationToken)
             ->getJson('/api/auth/me')
             ->assertUnauthorized();
+    }
+
+    /** @test */
+    public function password_forgot_returns_the_same_response_for_known_and_unknown_valid_email_addresses()
+    {
+        [, $user] = $this->organizationWithUser('admin');
+
+        $knownResponse = $this->postJson('/api/auth/password/forgot', [
+            'email' => $user->email,
+        ]);
+
+        $unknownResponse = $this->postJson('/api/auth/password/forgot', [
+            'email' => 'missing-' . uniqid() . '@example.com',
+        ]);
+
+        $knownResponse->assertOk()
+            ->assertJsonPath('message', 'If this is a valid account email, you will recieve a password reset email.');
+        $unknownResponse->assertOk()
+            ->assertJsonPath('message', 'If this is a valid account email, you will recieve a password reset email.');
+
+        $this->assertDatabaseHas('password_resets', [
+            'email' => $user->email,
+        ]);
+    }
+
+    /** @test */
+    public function password_reset_accepts_a_valid_token_updates_the_password_and_revokes_existing_tokens()
+    {
+        [, $user] = $this->organizationWithUser('admin');
+        $existingToken = $user->createToken('existing_token');
+        $newPassword = 'N3wP@ssword-' . uniqid() . '-Aa!';
+        $resetToken = Password::broker()->createToken($user);
+
+        $response = $this->postJson('/api/auth/password/reset', [
+            'token' => $resetToken,
+            'email' => $user->email,
+            'password' => $newPassword,
+            'password_confirmation' => $newPassword,
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('message', 'Password successfully reset.');
+
+        $this->assertTrue(Hash::check($newPassword, $user->fresh()->password));
+        $this->assertDatabaseMissing('personal_access_tokens', [
+            'id' => $existingToken->accessToken->id,
+        ]);
+        $this->assertDatabaseMissing('password_resets', [
+            'email' => $user->email,
+        ]);
+
+        $this->postJson('/api/auth/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ])->assertUnprocessable();
+
+        $this->postJson('/api/auth/login', [
+            'email' => $user->email,
+            'password' => $newPassword,
+        ])->assertOk();
+    }
+
+    /** @test */
+    public function password_reset_rejects_an_invalid_token()
+    {
+        [, $user] = $this->organizationWithUser('admin');
+        $newPassword = 'N3wP@ssword-' . uniqid() . '-Aa!';
+
+        $response = $this->postJson('/api/auth/password/reset', [
+            'token' => 'invalid-token',
+            'email' => $user->email,
+            'password' => $newPassword,
+            'password_confirmation' => $newPassword,
+        ]);
+
+        $response->assertUnprocessable()
+            ->assertJsonPath('message', 'There was a problem resetting the password.')
+            ->assertJsonValidationErrors('password');
+
+        $this->assertTrue(Hash::check('password', $user->fresh()->password));
     }
 
     /** @test */
