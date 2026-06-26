@@ -12,6 +12,60 @@ use Tests\TestCase;
 class UserControllerTest extends TestCase
 {
     /** @test */
+    public function user_index_returns_only_users_for_the_requested_organization()
+    {
+        [$organization, $admin] = $this->organizationWithUser('admin');
+        $editor = $this->userForOrganization($organization, 'editor');
+        [$otherOrganization] = $this->organizationWithUser('admin');
+        $otherUser = $this->userForOrganization($otherOrganization, 'editor');
+
+        $response = $this->actingAs($admin, 'sanctum')
+            ->getJson("/api/{$organization->slug}/users");
+
+        $response->assertOk()
+            ->assertJsonFragment(['id' => $admin->id])
+            ->assertJsonFragment(['id' => $editor->id])
+            ->assertJsonMissing(['id' => $otherUser->id]);
+    }
+
+    /** @test */
+    public function user_index_returns_only_the_approved_user_fields()
+    {
+        [$organization, $admin] = $this->organizationWithUser('admin');
+
+        $response = $this->actingAs($admin, 'sanctum')
+            ->getJson("/api/{$organization->slug}/users");
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'name',
+                        'email',
+                        'role',
+                        'created_at',
+                    ],
+                ],
+            ])
+            ->assertJsonMissingPath('data.0.password')
+            ->assertJsonMissingPath('data.0.remember_token')
+            ->assertJsonMissingPath('data.0.organization_id');
+    }
+
+    /** @test */
+    public function organization_user_cannot_list_users_from_another_organization()
+    {
+        [, $admin] = $this->organizationWithUser('admin');
+        [$otherOrganization] = $this->organizationWithUser('admin');
+
+        $response = $this->actingAs($admin, 'sanctum')
+            ->getJson("/api/{$otherOrganization->slug}/users");
+
+        $response->assertForbidden();
+    }
+
+    /** @test */
     public function organization_admin_can_delete_a_user_from_their_organization()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');
