@@ -138,29 +138,16 @@ class AuthControllerTest extends TestCase
     }
 
     /** @test */
-    public function user_can_register_ensure_a_default_rate_group_use_the_returned_token_logout_and_login_again()
+    public function registration_creates_an_admin_user_and_organization()
     {
-        $this->ensureFreePlan();
-
-        $password = 'R@teStream-' . uniqid() . '-Aa1!';
-        $email = 'new-user-' . uniqid() . '@example.com';
-        $organizationTitle = 'New Credit Union ' . uniqid();
-        $rateGroupCountBeforeRegistration = RateGroup::count();
-
-        $registerResponse = $this->postJson('/api/auth/register', [
-            'name' => 'New User',
-            'email' => $email,
-            'organization_title' => $organizationTitle,
-            'password' => $password,
-            'password_confirmation' => $password,
-        ]);
+        [$registerResponse, $payload] = $this->registerUser();
 
         $registerResponse->assertOk()
             ->assertJsonPath('message', 'Registration successful')
-            ->assertJsonPath('data.name', 'New User')
-            ->assertJsonPath('data.email', $email)
+            ->assertJsonPath('data.name', $payload['name'])
+            ->assertJsonPath('data.email', $payload['email'])
             ->assertJsonPath('data.role', 'admin')
-            ->assertJsonPath('data.organization.title', $organizationTitle)
+            ->assertJsonPath('data.organization.title', $payload['organization_title'])
             ->assertJsonStructure([
                 'data' => [
                     'access_token',
@@ -171,25 +158,50 @@ class AuthControllerTest extends TestCase
                 ],
             ]);
 
-        $user = User::where('email', $email)->firstOrFail();
-        $organization = Organization::where('title', $organizationTitle)->firstOrFail();
-        $defaultRateGroup = RateGroup::findOrFail($organization->default_rate_group_id);
-        $registrationToken = $registerResponse->json('data.access_token');
+        $user = User::where('email', $payload['email'])->firstOrFail();
+        $organization = Organization::where('title', $payload['organization_title'])->firstOrFail();
 
         $this->assertSame($organization->id, $user->organization_id);
         $this->assertSame('admin', $user->role->value);
+        $this->assertDatabaseCount('personal_access_tokens', 1);
+    }
+
+    /** @test */
+    public function registration_creates_a_default_rate_group_for_the_new_organization()
+    {
+        $rateGroupCountBeforeRegistration = RateGroup::count();
+        [, $payload] = $this->registerUser();
+
+        $organization = Organization::where('title', $payload['organization_title'])->firstOrFail();
+        $user = User::where('email', $payload['email'])->firstOrFail();
+        $defaultRateGroup = RateGroup::findOrFail($organization->default_rate_group_id);
+
         $this->assertSame($organization->id, $defaultRateGroup->organization_id);
         $this->assertSame($user->id, $defaultRateGroup->user_id);
         $this->assertSame('Default', $defaultRateGroup->title);
         $this->assertNotNull($defaultRateGroup->published_at);
         $this->assertSame($rateGroupCountBeforeRegistration + 1, RateGroup::count());
-        $this->assertDatabaseCount('personal_access_tokens', 1);
+    }
+
+    /** @test */
+    public function registration_token_can_fetch_the_authenticated_profile()
+    {
+        [$registerResponse, $payload] = $this->registerUser();
+        $user = User::where('email', $payload['email'])->firstOrFail();
+        $registrationToken = $registerResponse->json('data.access_token');
 
         $this->withHeader('Authorization', 'Bearer ' . $registrationToken)
             ->getJson('/api/auth/me')
             ->assertOk()
             ->assertJsonPath('data.id', $user->id)
-            ->assertJsonPath('data.email', $email);
+            ->assertJsonPath('data.email', $payload['email']);
+    }
+
+    /** @test */
+    public function logout_revokes_a_registration_token()
+    {
+        [$registerResponse] = $this->registerUser();
+        $registrationToken = $registerResponse->json('data.access_token');
 
         $this->withHeader('Authorization', 'Bearer ' . $registrationToken)
             ->postJson('/api/auth/logout')
@@ -197,18 +209,33 @@ class AuthControllerTest extends TestCase
             ->assertJsonPath('message', 'Tokens Revoked');
 
         $this->assertDatabaseCount('personal_access_tokens', 0);
+    }
+
+    /** @test */
+    public function user_can_log_in_after_logging_out_of_the_registration_token()
+    {
+        [$registerResponse, $payload] = $this->registerUser();
+        $organization = Organization::where('title', $payload['organization_title'])->firstOrFail();
+        $registrationToken = $registerResponse->json('data.access_token');
+
+        $this->withHeader('Authorization', 'Bearer ' . $registrationToken)
+            ->postJson('/api/auth/logout')
+            ->assertOk();
+
+        $this->assertDatabaseCount('personal_access_tokens', 0);
         $this->flushHeaders();
+        $this->flushSession();
         $this->app['auth']->forgetGuards();
         $this->app['auth']->shouldUse('web');
 
         $loginResponse = $this->postJson('/api/auth/login', [
-            'email' => $email,
-            'password' => $password,
+            'email' => $payload['email'],
+            'password' => $payload['password'],
         ]);
 
         $loginResponse->assertOk()
             ->assertJsonPath('message', 'Login successful')
-            ->assertJsonPath('data.email', $email)
+            ->assertJsonPath('data.email', $payload['email'])
             ->assertJsonPath('data.role', 'admin')
             ->assertJsonPath('data.organization.id', $organization->id);
 
@@ -220,8 +247,21 @@ class AuthControllerTest extends TestCase
         $this->withHeader('Authorization', 'Bearer ' . $loginToken)
             ->getJson('/api/auth/me')
             ->assertOk()
-            ->assertJsonPath('data.id', $user->id);
+            ->assertJsonPath('data.email', $payload['email']);
+    }
 
+    /** @test */
+    public function registration_token_cannot_be_used_after_logout()
+    {
+        [$registerResponse] = $this->registerUser();
+        $registrationToken = $registerResponse->json('data.access_token');
+
+        $this->withHeader('Authorization', 'Bearer ' . $registrationToken)
+            ->postJson('/api/auth/logout')
+            ->assertOk();
+
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+        $this->flushHeaders();
         $this->flushSession();
         $this->app['auth']->forgetGuards();
 
@@ -317,5 +357,21 @@ class AuthControllerTest extends TestCase
                 'limits' => [],
             ]
         );
+    }
+
+    private function registerUser(array $overrides = []): array
+    {
+        $this->ensureFreePlan();
+
+        $payload = array_merge([
+            'name' => 'New User',
+            'email' => 'new-user-' . uniqid() . '@example.com',
+            'organization_title' => 'New Credit Union ' . uniqid(),
+            'password' => 'R@teStream-' . uniqid() . '-Aa1!',
+        ], $overrides);
+
+        $payload['password_confirmation'] = $payload['password'];
+
+        return [$this->postJson('/api/auth/register', $payload), $payload];
     }
 }
