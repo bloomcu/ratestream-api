@@ -7,6 +7,7 @@ use DDD\Domain\Base\Users\User;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Rates\RateGroup;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class SyncPublishedRatesToWebsiteTest extends TestCase
@@ -68,6 +69,33 @@ class SyncPublishedRatesToWebsiteTest extends TestCase
         (new SyncPublishedRatesToWebsite($organization->id, $publishedGroup->id))->handle();
 
         Http::assertNothingSent();
+    }
+
+    /** @test */
+    public function it_throws_for_unsuccessful_webhook_responses_without_logging_the_sync_secret()
+    {
+        Log::spy();
+
+        Http::fake([
+            'https://example.com/wp-json/ratestream/v1/sync' => Http::response(['error' => 'server'], 500),
+        ]);
+
+        [$organization, $publishedGroup] = $this->publishedGroup('example.com');
+
+        try {
+            (new SyncPublishedRatesToWebsite($organization->id, $publishedGroup->id))->handle();
+            $this->fail('Expected webhook failure to throw.');
+        } catch (\Throwable $exception) {
+            $this->assertSame(500, $exception->response->status());
+        }
+
+        // Failure logging should include response details without leaking the sync secret.
+        Log::shouldHaveReceived('warning')->withArgs(function ($message, $context) {
+            return $message === 'Published rates webhook returned an unsuccessful response.'
+                && ($context['status'] ?? null) === 500
+                && ! isset($context['X-RateStream-Secret'])
+                && ! str_contains(json_encode($context), 'org-sync-key');
+        })->once();
     }
 
     private function publishedGroup(?string $ratesDomain, ?string $ratesSyncKey = 'org-sync-key'): array
