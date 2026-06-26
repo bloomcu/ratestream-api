@@ -58,6 +58,129 @@ class RateEditingEndpointsTest extends TestCase
     }
 
     /** @test */
+    public function rate_batch_creates_rates_and_columns_for_the_requested_rate_group()
+    {
+        [$organization, $user, $group] = $this->organizationWithUserAndGroup();
+
+        $response = $this->actingAs($user, 'sanctum')
+            ->postJson("/api/{$organization->slug}/rates/batch", [
+                'rate_group_id' => $group->id,
+                'rates' => [
+                    [
+                        'uid' => 'auto-loan',
+                        'data' => [
+                            'APR' => '5.99%',
+                        ],
+                    ],
+                ],
+                'columns' => [
+                    [
+                        'uid' => 'apr',
+                        'name' => 'APR',
+                    ],
+                ],
+                'deletes' => [],
+            ]);
+
+        $response->assertOk()
+            ->assertJsonPath('data.rates.0.uid', 'auto-loan')
+            ->assertJsonPath('data.rates.0.data.APR', '5.99%')
+            ->assertJsonPath('data.columns.0.uid', 'apr')
+            ->assertJsonPath('data.columns.0.name', 'APR');
+
+        $this->assertDatabaseHas('rates', [
+            'organization_id' => $organization->id,
+            'rate_group_id' => $group->id,
+            'uid' => 'auto-loan',
+        ]);
+        $this->assertDatabaseHas('columns', [
+            'organization_id' => $organization->id,
+            'rate_group_id' => $group->id,
+            'uid' => 'apr',
+            'name' => 'APR',
+        ]);
+    }
+
+    /** @test */
+    public function rate_batch_deletes_rates_and_columns_only_from_the_requested_group()
+    {
+        [$organization, $user, $group] = $this->organizationWithUserAndGroup();
+        $otherGroup = RateGroup::create([
+            'organization_id' => $organization->id,
+            'user_id' => $user->id,
+            'title' => 'Other Group',
+            'published_at' => now(),
+            'position' => 2,
+        ]);
+
+        $groupRate = Rate::create([
+            'organization_id' => $organization->id,
+            'user_id' => $user->id,
+            'rate_group_id' => $group->id,
+            'uid' => 'auto-loan',
+            'data' => ['APR' => '5.99%'],
+        ]);
+        $otherGroupRate = Rate::create([
+            'organization_id' => $organization->id,
+            'user_id' => $user->id,
+            'rate_group_id' => $otherGroup->id,
+            'uid' => 'auto-loan',
+            'data' => ['APR' => '6.99%'],
+        ]);
+
+        $groupColumn = Column::create([
+            'organization_id' => $organization->id,
+            'user_id' => $user->id,
+            'rate_group_id' => $group->id,
+            'uid' => 'apr',
+            'name' => 'APR',
+        ]);
+        $otherGroupColumn = Column::create([
+            'organization_id' => $organization->id,
+            'user_id' => $user->id,
+            'rate_group_id' => $otherGroup->id,
+            'uid' => 'apr',
+            'name' => 'APR',
+        ]);
+
+        $response = $this->actingAs($user, 'sanctum')
+            ->postJson("/api/{$organization->slug}/rates/batch", [
+                'rate_group_id' => $group->id,
+                'rates' => [],
+                'columns' => [],
+                'deletes' => [
+                    [
+                        'uid' => 'auto-loan',
+                        'model' => 'rate',
+                        'group_id' => $group->id,
+                    ],
+                    [
+                        'uid' => 'apr',
+                        'model' => 'column',
+                        'group_id' => $group->id,
+                    ],
+                ],
+            ]);
+
+        $response->assertOk();
+
+        $this->assertSoftDeleted('rates', [
+            'id' => $groupRate->id,
+        ]);
+        $this->assertDatabaseMissing('columns', [
+            'id' => $groupColumn->id,
+        ]);
+        $this->assertDatabaseHas('rates', [
+            'id' => $otherGroupRate->id,
+            'rate_group_id' => $otherGroup->id,
+        ]);
+        $this->assertDatabaseHas('columns', [
+            'id' => $otherGroupColumn->id,
+            'rate_group_id' => $otherGroup->id,
+        ]);
+    }
+
+    /** @test */
     public function column_store_creates_a_column_for_the_requested_organizations_rate_group()
     {
         [$organization, $user, $group] = $this->organizationWithUserAndGroup();
