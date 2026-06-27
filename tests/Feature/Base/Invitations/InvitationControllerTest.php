@@ -103,6 +103,60 @@ class InvitationControllerTest extends TestCase
     }
 
     /** @test */
+    public function organization_users_cannot_create_invitations_for_another_organization()
+    {
+        Mail::fake();
+
+        [, $admin] = $this->organizationWithUser('admin');
+        [$otherOrganization] = $this->organizationWithUser('admin');
+        $email = 'invitee-' . uniqid() . '@example.com';
+
+        $response = $this->actingAs($admin, 'sanctum')
+            ->postJson("/api/{$otherOrganization->slug}/invitations", [
+                'email' => $email,
+                'role' => 'editor',
+            ]);
+
+        $response->assertForbidden();
+
+        $this->assertDatabaseMissing('invitations', [
+            'email' => $email,
+        ]);
+        Mail::assertNothingSent();
+    }
+
+    /** @test */
+    public function super_admins_can_create_invitations_for_any_organization()
+    {
+        Mail::fake();
+
+        [, $superAdmin] = $this->organizationWithUser('super_admin');
+        [$organization] = $this->organizationWithUser('admin');
+        $email = 'invitee-' . uniqid() . '@example.com';
+
+        $response = $this->actingAs($superAdmin, 'sanctum')
+            ->postJson("/api/{$organization->slug}/invitations", [
+                'email' => $email,
+                'role' => 'editor',
+            ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.email', $email)
+            ->assertJsonPath('data.role', 'editor');
+
+        $this->assertDatabaseHas('invitations', [
+            'organization_id' => $organization->id,
+            'user_id' => $superAdmin->id,
+            'email' => $email,
+            'role' => 'editor',
+        ]);
+
+        Mail::assertSent(InvitationEmail::class, function ($mail) use ($email) {
+            return $mail->hasTo($email);
+        });
+    }
+
+    /** @test */
     public function invitation_create_rejects_existing_user_and_invitation_emails()
     {
         Mail::fake();

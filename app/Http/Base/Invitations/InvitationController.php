@@ -43,6 +43,10 @@ class InvitationController extends Controller
 
     public function show(Organization $organization, Invitation $invitation)
     {
+        if ($invitation->organization_id !== $organization->id) {
+            abort(404);
+        }
+
         return new InvitationResource($invitation->load(['organization', 'user']));
     }
 
