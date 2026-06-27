@@ -7,6 +7,7 @@ use DDD\App\Controllers\Controller;
 
 // Models
 use DDD\Domain\Base\Organizations\Organization;
+use DDD\Domain\Base\Users\Enums\RoleEnum;
 
 // Resources
 use DDD\Domain\Base\Organizations\Resources\OrganizationResource;
@@ -21,7 +22,12 @@ class OrganizationController extends Controller
      */
     public function index()
     {
-        $organizations = Organization::latest()->get();
+        $organizations = Organization::query()
+            ->when(auth()->user()?->role !== RoleEnum::SuperAdmin, function ($query) {
+                $query->where('id', auth()->user()->organization_id);
+            })
+            ->orderBy('title')
+            ->get();
 
         return OrganizationResource::collection($organizations);
     }
