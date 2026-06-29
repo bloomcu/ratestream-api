@@ -70,6 +70,21 @@ class RateSyncKeyControllerTest extends TestCase
     }
 
     /** @test */
+    public function rotate_does_not_return_the_stale_sync_key()
+    {
+        [$organization, $admin] = $this->organizationWithUser('admin', [
+            'rates_sync_key' => 'existing-sync-key',
+        ]);
+
+        $response = $this->actingAs($admin, 'sanctum')
+            ->postJson("/api/{$organization->slug}/rates/sync-key/rotate");
+
+        $response->assertOk();
+
+        $this->assertNotSame('existing-sync-key', $response->json('data.key'));
+    }
+
+    /** @test */
     public function super_admin_can_manage_any_organizations_rates_sync_key()
     {
         [$organization] = $this->organizationWithUser('admin');
