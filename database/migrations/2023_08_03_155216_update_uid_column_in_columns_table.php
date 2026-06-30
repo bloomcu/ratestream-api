@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('columns', function (Blueprint $table) {
-            $table->string('uid')->unique(false)->change();
+            $table->string('uid')->nullable()->unique(false)->change();
         });
     }
 
@@ -26,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('columns', function (Blueprint $table) {
-            $table->string('uid')->unique()->change();
+            $table->string('uid')->nullable()->unique()->change();
         });
     }
 };
