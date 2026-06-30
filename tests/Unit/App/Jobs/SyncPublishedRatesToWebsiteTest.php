@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\App\Jobs;
 
+use PHPUnit\Framework\Attributes\Test;
 use DDD\App\Jobs\SyncPublishedRatesToWebsite;
 use DDD\Domain\Base\Users\User;
 use DDD\Domain\Organizations\Organization;
@@ -12,7 +13,7 @@ use Tests\TestCase;
 
 class SyncPublishedRatesToWebsiteTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_posts_to_the_organizations_rates_domain()
     {
         Http::fake([
@@ -30,7 +31,7 @@ class SyncPublishedRatesToWebsiteTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_preserves_an_existing_scheme_and_port()
     {
         Http::fake([
@@ -47,7 +48,7 @@ class SyncPublishedRatesToWebsiteTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_skips_the_request_when_the_organization_has_no_rates_domain()
     {
         Http::fake();
@@ -59,7 +60,7 @@ class SyncPublishedRatesToWebsiteTest extends TestCase
         Http::assertNothingSent();
     }
 
-    /** @test */
+    #[Test]
     public function it_skips_the_request_when_the_organization_has_no_rates_sync_key()
     {
         Http::fake();
@@ -71,7 +72,7 @@ class SyncPublishedRatesToWebsiteTest extends TestCase
         Http::assertNothingSent();
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_for_unsuccessful_webhook_responses_without_logging_the_sync_secret()
     {
         Log::spy();

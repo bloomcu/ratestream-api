@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Rates;
 
+use PHPUnit\Framework\Attributes\Test;
 use DDD\Domain\Base\Users\User;
 use DDD\Domain\Columns\Column;
 use DDD\Domain\Organizations\Organization;
@@ -11,7 +12,7 @@ use Tests\TestCase;
 
 class RateEditingEndpointsTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function rate_batch_rejects_malformed_payloads()
     {
         [$organization, $user, $group] = $this->organizationWithUserAndGroup();
@@ -39,7 +40,7 @@ class RateEditingEndpointsTest extends TestCase
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function rate_batch_rejects_a_rate_group_from_another_organization()
     {
         [$organization, $user] = $this->organizationWithUserAndGroup();
@@ -57,7 +58,7 @@ class RateEditingEndpointsTest extends TestCase
             ->assertSeeText('Invalid rate group for this organization.');
     }
 
-    /** @test */
+    #[Test]
     public function rate_batch_creates_rates_and_columns_for_the_requested_rate_group()
     {
         [$organization, $user, $group] = $this->organizationWithUserAndGroup();
@@ -101,7 +102,7 @@ class RateEditingEndpointsTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function rate_batch_deletes_rates_and_columns_only_from_the_requested_group()
     {
         [$organization, $user, $group] = $this->organizationWithUserAndGroup();
@@ -180,7 +181,7 @@ class RateEditingEndpointsTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function column_store_creates_a_column_for_the_requested_organizations_rate_group()
     {
         [$organization, $user, $group] = $this->organizationWithUserAndGroup();
@@ -203,7 +204,7 @@ class RateEditingEndpointsTest extends TestCase
         $this->assertNull($column->uid);
     }
 
-    /** @test */
+    #[Test]
     public function column_order_update_reorders_columns_within_the_organization()
     {
         [$organization, $user, $group] = $this->organizationWithUserAndGroup();
@@ -235,7 +236,7 @@ class RateEditingEndpointsTest extends TestCase
         $this->assertSame(2, $first->fresh()->order);
     }
 
-    /** @test */
+    #[Test]
     public function rate_uid_update_changes_the_uid_for_a_rate_in_the_same_organization()
     {
         [$organization, $user, $group] = $this->organizationWithUserAndGroup();
@@ -258,7 +259,7 @@ class RateEditingEndpointsTest extends TestCase
         $this->assertSame('updated-auto-loan', $rate->fresh()->uid);
     }
 
-    /** @test */
+    #[Test]
     public function rate_uid_update_rejects_a_duplicate_uid_within_the_same_organization()
     {
         [$organization, $user, $group] = $this->organizationWithUserAndGroup();

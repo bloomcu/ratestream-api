@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Domain\Organizations;
 
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 // Models
@@ -10,7 +11,7 @@ use DDD\Domain\Base\Users\User;
 
 class OrganizationTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_has_a_slug()
     {
         $organization = Organization::factory()->create();
@@ -18,7 +19,7 @@ class OrganizationTest extends TestCase
         $this->assertNotNull($organization->slug);
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_the_slug_for_the_route_key_name()
     {
         $this->markTestSkipped(
@@ -26,7 +27,7 @@ class OrganizationTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_has_many_users()
     {
         $organization = Organization::factory()

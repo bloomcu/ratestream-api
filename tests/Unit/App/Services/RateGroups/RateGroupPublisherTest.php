@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\App\Services\RateGroups;
 
+use PHPUnit\Framework\Attributes\Test;
 use DDD\App\Jobs\SyncPublishedRatesToWebsite;
 use DDD\App\Services\RateGroups\RateGroupPublisher;
 use DDD\Domain\Base\Users\User;
@@ -13,7 +14,7 @@ use Tests\TestCase;
 
 class RateGroupPublisherTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_dispatches_the_website_sync_job_after_publishing_a_revision()
     {
         Queue::fake();
@@ -29,7 +30,7 @@ class RateGroupPublisherTest extends TestCase
         Queue::assertPushed(SyncPublishedRatesToWebsite::class, 1);
     }
 
-    /** @test */
+    #[Test]
     public function it_promotes_the_revision_rate_state_when_publishing()
     {
         Queue::fake();

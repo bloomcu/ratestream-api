@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Base\Invitations;
 
+use PHPUnit\Framework\Attributes\Test;
 use DDD\Domain\Base\Invitations\Invitation;
 use DDD\Domain\Base\Invitations\Mail\InvitationEmail;
 use DDD\Domain\Base\Subscriptions\Plans\Plan;
@@ -27,7 +28,7 @@ class InvitationControllerTest extends TestCase
         $this->ensureFreePlan();
     }
 
-    /** @test */
+    #[Test]
     public function public_invitation_show_returns_the_invitation_for_the_requested_organization()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');
@@ -46,7 +47,7 @@ class InvitationControllerTest extends TestCase
             ->assertJsonPath('data.user.id', $admin->id);
     }
 
-    /** @test */
+    #[Test]
     public function public_invitation_show_rejects_an_invitation_from_another_organization()
     {
         [$organization] = $this->organizationWithUser('admin');
@@ -58,7 +59,7 @@ class InvitationControllerTest extends TestCase
         $response->assertNotFound();
     }
 
-    /** @test */
+    #[Test]
     public function invitation_index_lists_only_invitations_for_the_requested_organization()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');
@@ -74,7 +75,7 @@ class InvitationControllerTest extends TestCase
             ->assertJsonMissing(['uuid' => $otherInvitation->uuid]);
     }
 
-    /** @test */
+    #[Test]
     public function organization_users_can_create_invitations_for_their_organization()
     {
         Mail::fake();
@@ -102,7 +103,7 @@ class InvitationControllerTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function organization_users_cannot_create_invitations_for_another_organization()
     {
         Mail::fake();
@@ -125,7 +126,7 @@ class InvitationControllerTest extends TestCase
         Mail::assertNothingSent();
     }
 
-    /** @test */
+    #[Test]
     public function super_admins_can_create_invitations_for_any_organization()
     {
         Mail::fake();
@@ -156,7 +157,7 @@ class InvitationControllerTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function invitation_create_rejects_existing_user_and_invitation_emails()
     {
         Mail::fake();
@@ -185,7 +186,7 @@ class InvitationControllerTest extends TestCase
         Mail::assertNothingSent();
     }
 
-    /** @test */
+    #[Test]
     public function invitation_delete_removes_an_invitation_from_the_requested_organization()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');
@@ -202,7 +203,7 @@ class InvitationControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function invitation_delete_rejects_an_invitation_from_another_organization()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');
@@ -219,7 +220,7 @@ class InvitationControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function invitation_registration_uses_the_invitation_email_creates_an_editor_and_consumes_the_invitation()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');

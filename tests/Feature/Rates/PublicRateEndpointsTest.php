@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Rates;
 
+use PHPUnit\Framework\Attributes\Test;
 use DDD\Domain\Base\Users\User;
 use DDD\Domain\Columns\Column;
 use DDD\Domain\Organizations\Organization;
@@ -11,7 +12,7 @@ use Tests\TestCase;
 
 class PublicRateEndpointsTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function public_rates_index_returns_the_default_rate_group_for_the_organization()
     {
         [$organization, $user] = $this->organizationWithUser();
@@ -41,7 +42,7 @@ class PublicRateEndpointsTest extends TestCase
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function public_rates_index_can_return_an_explicit_rate_group_for_the_same_organization()
     {
         [$organization, $user] = $this->organizationWithUser();
@@ -67,7 +68,7 @@ class PublicRateEndpointsTest extends TestCase
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function public_rates_index_rejects_a_rate_group_from_another_organization()
     {
         [$organization] = $this->organizationWithUser();
@@ -80,7 +81,7 @@ class PublicRateEndpointsTest extends TestCase
             ->assertSeeText('Invalid rate group for this organization.');
     }
 
-    /** @test */
+    #[Test]
     public function public_rates_export_streams_csv_for_the_default_rate_group()
     {
         [$organization, $user] = $this->organizationWithUser();

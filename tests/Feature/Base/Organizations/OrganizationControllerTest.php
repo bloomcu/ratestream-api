@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Base\Organizations;
 
+use PHPUnit\Framework\Attributes\Test;
 use DDD\Domain\Base\Organizations\Organization;
 use DDD\Domain\Base\Subscriptions\Plans\Plan;
 use DDD\Domain\Base\Users\User;
@@ -17,7 +18,7 @@ class OrganizationControllerTest extends TestCase
         $this->ensureFreePlan();
     }
 
-    /** @test */
+    #[Test]
     public function unauthenticated_users_cannot_access_organization_routes()
     {
         $organization = $this->organization();
@@ -30,7 +31,7 @@ class OrganizationControllerTest extends TestCase
         $this->deleteJson("/api/organizations/{$organization->slug}")->assertUnauthorized();
     }
 
-    /** @test */
+    #[Test]
     public function organization_index_returns_only_the_authenticated_users_organization()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');
@@ -44,7 +45,7 @@ class OrganizationControllerTest extends TestCase
             ->assertJsonMissing(['id' => $otherOrganization->id]);
     }
 
-    /** @test */
+    #[Test]
     public function super_admins_can_list_all_organizations()
     {
         $middleOrganization = $this->organization('Middle Credit Union');
@@ -68,7 +69,7 @@ class OrganizationControllerTest extends TestCase
         ], $titles);
     }
 
-    /** @test */
+    #[Test]
     public function users_can_show_their_own_organization_by_slug()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');
@@ -81,7 +82,7 @@ class OrganizationControllerTest extends TestCase
             ->assertJsonPath('data.slug', $organization->slug);
     }
 
-    /** @test */
+    #[Test]
     public function users_cannot_show_another_organization_by_slug()
     {
         [, $admin] = $this->organizationWithUser('admin');
@@ -93,7 +94,7 @@ class OrganizationControllerTest extends TestCase
         $response->assertForbidden();
     }
 
-    /** @test */
+    #[Test]
     public function super_admins_can_show_any_organization_by_slug()
     {
         [, $superAdmin] = $this->organizationWithUser('super_admin');
@@ -106,7 +107,7 @@ class OrganizationControllerTest extends TestCase
             ->assertJsonPath('data.id', $organization->id);
     }
 
-    /** @test */
+    #[Test]
     public function users_can_update_their_own_organization_title_and_rates_domain()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');
@@ -129,7 +130,7 @@ class OrganizationControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function users_cannot_update_another_organization()
     {
         [, $admin] = $this->organizationWithUser('admin');
@@ -148,7 +149,7 @@ class OrganizationControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function authenticated_users_can_create_an_organization_with_a_default_rate_group()
     {
         [, $admin] = $this->organizationWithUser('admin');
@@ -172,7 +173,7 @@ class OrganizationControllerTest extends TestCase
         $this->assertNotNull($rateGroup->published_at);
     }
 
-    /** @test */
+    #[Test]
     public function users_cannot_delete_another_organization()
     {
         [, $admin] = $this->organizationWithUser('admin');
@@ -188,7 +189,7 @@ class OrganizationControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function super_admins_can_delete_an_empty_organization()
     {
         [, $superAdmin] = $this->organizationWithUser('super_admin');

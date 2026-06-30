@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Base\Auth;
 
+use PHPUnit\Framework\Attributes\Test;
 use DDD\Domain\Base\Invitations\Invitation;
 use DDD\Domain\Base\Subscriptions\Plans\Plan;
 use DDD\Domain\Base\Users\User;
@@ -26,7 +27,7 @@ class AuthControllerTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function user_can_login_with_valid_credentials_and_receives_a_sanctum_token()
     {
         [$organization, $user] = $this->organizationWithUser('admin');
@@ -56,7 +57,7 @@ class AuthControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function login_revokes_existing_tokens_before_issuing_a_new_token()
     {
         [, $user] = $this->organizationWithUser('admin');
@@ -80,7 +81,7 @@ class AuthControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function login_rejects_invalid_credentials()
     {
         [, $user] = $this->organizationWithUser('admin');
@@ -97,7 +98,7 @@ class AuthControllerTest extends TestCase
         $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
-    /** @test */
+    #[Test]
     public function authenticated_user_can_fetch_their_profile()
     {
         [, $user] = $this->organizationWithUser('editor');
@@ -114,7 +115,7 @@ class AuthControllerTest extends TestCase
             ->assertJsonMissingPath('data.remember_token');
     }
 
-    /** @test */
+    #[Test]
     public function unauthenticated_user_cannot_fetch_their_profile()
     {
         $response = $this->getJson('/api/auth/me');
@@ -122,7 +123,7 @@ class AuthControllerTest extends TestCase
         $response->assertUnauthorized();
     }
 
-    /** @test */
+    #[Test]
     public function logout_revokes_the_current_users_tokens()
     {
         [, $user] = $this->organizationWithUser('admin');
@@ -139,7 +140,7 @@ class AuthControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function registration_creates_an_admin_user_and_organization()
     {
         [$registerResponse, $payload] = $this->registerUser();
@@ -168,7 +169,7 @@ class AuthControllerTest extends TestCase
         $this->assertDatabaseCount('personal_access_tokens', 1);
     }
 
-    /** @test */
+    #[Test]
     public function registration_creates_a_default_rate_group_for_the_new_organization()
     {
         $rateGroupCountBeforeRegistration = RateGroup::count();
@@ -185,7 +186,7 @@ class AuthControllerTest extends TestCase
         $this->assertSame($rateGroupCountBeforeRegistration + 1, RateGroup::count());
     }
 
-    /** @test */
+    #[Test]
     public function registration_token_can_fetch_the_authenticated_profile()
     {
         [$registerResponse, $payload] = $this->registerUser();
@@ -199,7 +200,7 @@ class AuthControllerTest extends TestCase
             ->assertJsonPath('data.email', $payload['email']);
     }
 
-    /** @test */
+    #[Test]
     public function logout_revokes_a_registration_token()
     {
         [$registerResponse] = $this->registerUser();
@@ -213,7 +214,7 @@ class AuthControllerTest extends TestCase
         $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_log_in_after_logging_out_of_the_registration_token()
     {
         [$registerResponse, $payload] = $this->registerUser();
@@ -252,7 +253,7 @@ class AuthControllerTest extends TestCase
             ->assertJsonPath('data.email', $payload['email']);
     }
 
-    /** @test */
+    #[Test]
     public function registration_token_cannot_be_used_after_logout()
     {
         [$registerResponse] = $this->registerUser();
@@ -272,7 +273,7 @@ class AuthControllerTest extends TestCase
             ->assertUnauthorized();
     }
 
-    /** @test */
+    #[Test]
     public function password_forgot_returns_the_same_response_for_known_and_unknown_valid_email_addresses()
     {
         [, $user] = $this->organizationWithUser('admin');
@@ -295,7 +296,7 @@ class AuthControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function password_reset_accepts_a_valid_token_updates_the_password_and_revokes_existing_tokens()
     {
         [, $user] = $this->organizationWithUser('admin');
@@ -332,7 +333,7 @@ class AuthControllerTest extends TestCase
         ])->assertOk();
     }
 
-    /** @test */
+    #[Test]
     public function password_reset_rejects_an_invalid_token()
     {
         [, $user] = $this->organizationWithUser('admin');
@@ -352,7 +353,7 @@ class AuthControllerTest extends TestCase
         $this->assertTrue(Hash::check('password', $user->fresh()->password));
     }
 
-    /** @test */
+    #[Test]
     public function registration_rejects_an_existing_user_email()
     {
         [, $existingUser] = $this->organizationWithUser('admin');
@@ -374,7 +375,7 @@ class AuthControllerTest extends TestCase
         $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
-    /** @test */
+    #[Test]
     public function registration_rejects_an_email_with_a_pending_invitation()
     {
         [$organization, $invitingUser] = $this->organizationWithUser('admin');

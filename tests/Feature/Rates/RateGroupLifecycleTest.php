@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Rates;
 
+use PHPUnit\Framework\Attributes\Test;
 use DDD\App\Jobs\SyncPublishedRatesToWebsite;
 use DDD\Domain\Base\Users\User;
 use DDD\Domain\Columns\Column;
@@ -14,7 +15,7 @@ use Tests\TestCase;
 
 class RateGroupLifecycleTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function rate_groups_index_lists_only_unarchived_groups_for_the_requested_organization()
     {
         [$organization, $user, $publishedGroup] = $this->organizationWithPublishedGroup();
@@ -38,7 +39,7 @@ class RateGroupLifecycleTest extends TestCase
             ->assertJsonMissing(['organization_id' => $otherOrganization->id]);
     }
 
-    /** @test */
+    #[Test]
     public function rate_group_clone_creates_a_draft_revision_with_copied_columns_and_rates()
     {
         [$organization, $user, $publishedGroup] = $this->organizationWithPublishedGroup();
@@ -76,7 +77,7 @@ class RateGroupLifecycleTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function rate_group_clone_rejects_a_rate_group_from_another_organization()
     {
         [$organization, $user] = $this->organizationWithPublishedGroup();
@@ -89,7 +90,7 @@ class RateGroupLifecycleTest extends TestCase
             ->assertSeeText('Rate group does not belong to this organization.');
     }
 
-    /** @test */
+    #[Test]
     public function rate_group_revisions_index_lists_only_revisions_for_the_requested_parent_group()
     {
         [$organization, $user, $publishedGroup] = $this->organizationWithPublishedGroup();
@@ -110,7 +111,7 @@ class RateGroupLifecycleTest extends TestCase
             ->assertJsonMissing(['id' => $unrelatedRevision->id]);
     }
 
-    /** @test */
+    #[Test]
     public function rate_group_revisions_index_rejects_a_parent_group_from_another_organization()
     {
         [$organization, $user] = $this->organizationWithPublishedGroup();
@@ -123,7 +124,7 @@ class RateGroupLifecycleTest extends TestCase
             ->assertSeeText('Rate group does not belong to this organization.');
     }
 
-    /** @test */
+    #[Test]
     public function rate_group_publish_promotes_a_revision_to_the_default_group_and_dispatches_website_sync()
     {
         Queue::fake();
@@ -152,7 +153,7 @@ class RateGroupLifecycleTest extends TestCase
         Queue::assertPushed(SyncPublishedRatesToWebsite::class, 1);
     }
 
-    /** @test */
+    #[Test]
     public function rate_group_publish_rejects_a_non_revision_group()
     {
         Queue::fake();
@@ -168,7 +169,7 @@ class RateGroupLifecycleTest extends TestCase
         Queue::assertNotPushed(SyncPublishedRatesToWebsite::class);
     }
 
-    /** @test */
+    #[Test]
     public function rate_group_publish_rejects_a_rate_group_from_another_organization()
     {
         Queue::fake();
@@ -186,7 +187,7 @@ class RateGroupLifecycleTest extends TestCase
         Queue::assertNotPushed(SyncPublishedRatesToWebsite::class);
     }
 
-    /** @test */
+    #[Test]
     public function rate_group_schedule_stores_a_revision_publish_time_in_utc()
     {
         [$organization, $user, $publishedGroup] = $this->organizationWithPublishedGroup();
@@ -205,7 +206,7 @@ class RateGroupLifecycleTest extends TestCase
         $this->assertSame('2030-01-02T14:30:00+00:00', $storedTime);
     }
 
-    /** @test */
+    #[Test]
     public function rate_group_schedule_rejects_invalid_dates()
     {
         [$organization, $user, $publishedGroup] = $this->organizationWithPublishedGroup();
@@ -222,7 +223,7 @@ class RateGroupLifecycleTest extends TestCase
         $this->assertNull($revision->fresh()->published_at);
     }
 
-    /** @test */
+    #[Test]
     public function rate_group_schedule_rejects_a_non_revision_group()
     {
         [$organization, $user, $publishedGroup] = $this->organizationWithPublishedGroup();
@@ -236,7 +237,7 @@ class RateGroupLifecycleTest extends TestCase
             ->assertSeeText('Only revisions can be scheduled.');
     }
 
-    /** @test */
+    #[Test]
     public function rate_group_schedule_rejects_a_rate_group_from_another_organization()
     {
         [$organization, $user] = $this->organizationWithPublishedGroup();
