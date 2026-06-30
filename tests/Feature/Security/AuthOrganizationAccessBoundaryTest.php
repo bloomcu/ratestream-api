@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Security;
 
+use PHPUnit\Framework\Attributes\Test;
 use DDD\Domain\Base\Users\User;
 use DDD\Domain\Organizations\Organization;
 use DDD\Domain\Rates\RateGroup;
@@ -9,7 +10,7 @@ use Tests\TestCase;
 
 class AuthOrganizationAccessBoundaryTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function unauthenticated_users_cannot_access_the_rate_groups_index_route()
     {
         [$organization] = $this->organizationWithUser('admin');
@@ -18,7 +19,7 @@ class AuthOrganizationAccessBoundaryTest extends TestCase
             ->assertUnauthorized();
     }
 
-    /** @test */
+    #[Test]
     public function editors_can_access_their_own_organizations_rate_groups_index_route()
     {
         [$organization, $editor] = $this->organizationWithUser('editor');
@@ -30,7 +31,7 @@ class AuthOrganizationAccessBoundaryTest extends TestCase
             ->assertJsonPath('0.group.id', $group->id);
     }
 
-    /** @test */
+    #[Test]
     public function admins_can_access_their_own_organizations_rates_sync_key_show_route()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');
@@ -40,7 +41,7 @@ class AuthOrganizationAccessBoundaryTest extends TestCase
             ->assertOk();
     }
 
-    /** @test */
+    #[Test]
     public function editors_cannot_access_their_own_organizations_rates_sync_key_show_route()
     {
         [$organization, $editor] = $this->organizationWithUser('editor');
@@ -50,7 +51,7 @@ class AuthOrganizationAccessBoundaryTest extends TestCase
             ->assertForbidden();
     }
 
-    /** @test */
+    #[Test]
     public function users_cannot_access_another_organizations_rate_groups_index_route()
     {
         [$organization, $editor] = $this->organizationWithUser('editor');
@@ -67,7 +68,7 @@ class AuthOrganizationAccessBoundaryTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function admins_cannot_access_another_organizations_rates_sync_key_show_route()
     {
         [$organization] = $this->organizationWithUser('admin');
@@ -78,7 +79,7 @@ class AuthOrganizationAccessBoundaryTest extends TestCase
             ->assertForbidden();
     }
 
-    /** @test */
+    #[Test]
     public function super_admins_can_access_any_organizations_rate_groups_index_route()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');
@@ -91,7 +92,7 @@ class AuthOrganizationAccessBoundaryTest extends TestCase
             ->assertJsonPath('0.group.id', $group->id);
     }
 
-    /** @test */
+    #[Test]
     public function super_admins_can_access_any_organizations_rates_sync_key_show_route()
     {
         [$organization] = $this->organizationWithUser('admin');

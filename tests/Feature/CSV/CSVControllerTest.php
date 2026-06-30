@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\CSV;
 
+use PHPUnit\Framework\Attributes\Test;
 use DDD\Domain\Base\Files\File;
 use DDD\Domain\Base\Users\User;
 use DDD\Domain\Organizations\Organization;
@@ -10,7 +11,7 @@ use Tests\TestCase;
 
 class CSVControllerTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function csv_preview_parses_columns_and_rows_for_the_requested_organization_file()
     {
         Storage::fake();
@@ -34,7 +35,7 @@ class CSVControllerTest extends TestCase
             ->assertJsonPath('rows.1.data.term', '72');
     }
 
-    /** @test */
+    #[Test]
     public function csv_preview_rejects_duplicate_column_uids()
     {
         Storage::fake();
@@ -50,7 +51,7 @@ class CSVControllerTest extends TestCase
             ->assertJsonPath('errors.uid.0', 'Duplicate columns found: The CSV contains duplicate columns using the same Unique ID.');
     }
 
-    /** @test */
+    #[Test]
     public function csv_preview_rejects_a_missing_unique_id_header_cell()
     {
         Storage::fake();
@@ -66,7 +67,7 @@ class CSVControllerTest extends TestCase
             ->assertJsonPath('errors.uid.0', 'Incorrect A1 cell: The first value of the CSV in cell A1 does not contain the term "Unique ID".');
     }
 
-    /** @test */
+    #[Test]
     public function csv_preview_rejects_a_missing_column_uid()
     {
         Storage::fake();
@@ -82,7 +83,7 @@ class CSVControllerTest extends TestCase
             ->assertJsonPath('errors.uid.0', 'Missing column Unique ID: The Unique ID is missing on one or more columns.');
     }
 
-    /** @test */
+    #[Test]
     public function csv_preview_rejects_a_missing_column_name()
     {
         Storage::fake();
@@ -98,7 +99,7 @@ class CSVControllerTest extends TestCase
             ->assertJsonPath('errors.uid.0', 'Missing column name: The name is missing for one or more columns in the second row of the CSV.');
     }
 
-    /** @test */
+    #[Test]
     public function csv_preview_rejects_a_missing_row_uid()
     {
         Storage::fake();
@@ -114,7 +115,7 @@ class CSVControllerTest extends TestCase
             ->assertJsonPath('errors.uid.0', 'Missing row Unique ID: The Unique ID is missing on one or more rows.');
     }
 
-    /** @test */
+    #[Test]
     public function csv_preview_rejects_duplicate_row_uids()
     {
         Storage::fake();

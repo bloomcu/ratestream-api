@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Base\Users;
 
+use PHPUnit\Framework\Attributes\Test;
 use DDD\Domain\Base\Users\User;
 use DDD\Domain\Columns\Column;
 use DDD\Domain\Organizations\Organization;
@@ -11,7 +12,7 @@ use Tests\TestCase;
 
 class UserControllerTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function user_index_returns_only_users_for_the_requested_organization()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');
@@ -28,7 +29,7 @@ class UserControllerTest extends TestCase
             ->assertJsonMissing(['id' => $otherUser->id]);
     }
 
-    /** @test */
+    #[Test]
     public function user_index_returns_only_the_approved_user_fields()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');
@@ -53,7 +54,7 @@ class UserControllerTest extends TestCase
             ->assertJsonMissingPath('data.0.organization_id');
     }
 
-    /** @test */
+    #[Test]
     public function organization_user_cannot_list_users_from_another_organization()
     {
         [, $admin] = $this->organizationWithUser('admin');
@@ -65,7 +66,7 @@ class UserControllerTest extends TestCase
         $response->assertForbidden();
     }
 
-    /** @test */
+    #[Test]
     public function organization_admin_can_delete_a_user_from_their_organization()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');
@@ -82,7 +83,7 @@ class UserControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function editor_cannot_delete_a_user_from_their_organization()
     {
         [$organization, $editor] = $this->organizationWithUser('editor');
@@ -98,7 +99,7 @@ class UserControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_without_a_role_cannot_delete_a_user_from_their_organization()
     {
         [$organization, $userWithoutRole] = $this->organizationWithUser(null);
@@ -114,7 +115,7 @@ class UserControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function organization_admin_can_soft_delete_a_user_who_owns_ratestream_records()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');
@@ -165,7 +166,7 @@ class UserControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function admin_cannot_delete_a_user_from_another_organization()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');
@@ -182,7 +183,7 @@ class UserControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function super_admin_can_delete_a_user_from_any_organization()
     {
         [$organization] = $this->organizationWithUser('admin');
@@ -201,7 +202,7 @@ class UserControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function organization_admin_can_update_an_editor_to_admin_within_their_organization()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');
@@ -222,7 +223,7 @@ class UserControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function organization_admin_can_update_an_admin_or_editor_to_editor_within_their_organization()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');
@@ -254,7 +255,7 @@ class UserControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function organization_admin_cannot_update_a_user_role_from_another_organization()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');
@@ -274,7 +275,7 @@ class UserControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function editor_cannot_update_user_roles()
     {
         [$organization, $editor] = $this->organizationWithUser('editor');
@@ -293,7 +294,7 @@ class UserControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_without_a_role_cannot_update_user_roles()
     {
         [$organization, $userWithoutRole] = $this->organizationWithUser(null);
@@ -312,7 +313,7 @@ class UserControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function admin_cannot_assign_the_super_admin_role()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');
@@ -331,7 +332,7 @@ class UserControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function admin_cannot_modify_an_existing_super_admin()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');
@@ -350,7 +351,7 @@ class UserControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function super_admin_can_update_a_user_role_across_organizations()
     {
         [$organization] = $this->organizationWithUser('admin');
@@ -373,7 +374,7 @@ class UserControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function invalid_role_returns_a_validation_error()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');
@@ -388,7 +389,7 @@ class UserControllerTest extends TestCase
             ->assertJsonValidationErrors('role');
     }
 
-    /** @test */
+    #[Test]
     public function missing_role_returns_a_validation_error()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');

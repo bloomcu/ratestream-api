@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Security;
 
+use PHPUnit\Framework\Attributes\Test;
 use DDD\Domain\Base\Comments\Comment;
 use DDD\Domain\Base\Files\File;
 use DDD\Domain\Base\Media\Media;
@@ -17,7 +18,7 @@ use Tests\TestCase;
 
 class CrossOrganizationRouteModelAccessTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function organization_admin_cannot_update_another_organizations_rate_uid()
     {
         [$organization, $admin] = $this->organizationWithAdmin('Requester CU');
@@ -47,7 +48,7 @@ class CrossOrganizationRouteModelAccessTest extends TestCase
         $this->assertSame('target-rate', $otherRate->fresh()->uid);
     }
 
-    /** @test */
+    #[Test]
     public function organization_admin_cannot_reorder_another_organizations_column()
     {
         [$organization, $admin] = $this->organizationWithAdmin('Requester CU');
@@ -70,7 +71,7 @@ class CrossOrganizationRouteModelAccessTest extends TestCase
         $this->assertSame(1, $otherColumn->fresh()->order);
     }
 
-    /** @test */
+    #[Test]
     public function organization_admin_cannot_preview_another_organizations_csv_file()
     {
         Storage::fake();
@@ -97,7 +98,7 @@ class CrossOrganizationRouteModelAccessTest extends TestCase
         $response->assertNotFound();
     }
 
-    /** @test */
+    #[Test]
     public function organization_admin_cannot_delete_another_organizations_comment()
     {
         [$organization, $admin] = $this->organizationWithAdmin('Requester CU');
@@ -123,7 +124,7 @@ class CrossOrganizationRouteModelAccessTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function organization_admin_cannot_delete_another_organizations_media()
     {
         [$organization, $admin] = $this->organizationWithAdmin('Requester CU');

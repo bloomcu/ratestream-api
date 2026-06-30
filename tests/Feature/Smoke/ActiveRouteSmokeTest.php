@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Smoke;
 
+use PHPUnit\Framework\Attributes\Test;
 use DDD\Domain\Base\Files\File;
 use DDD\Domain\Base\Invitations\Invitation;
 use DDD\Domain\Base\Subscriptions\Plans\Plan;
@@ -24,7 +25,7 @@ class ActiveRouteSmokeTest extends TestCase
         $this->ensureFreePlan();
     }
 
-    /** @test */
+    #[Test]
     public function active_product_route_signatures_are_registered()
     {
         $registeredRoutes = collect(Route::getRoutes())
@@ -45,7 +46,7 @@ class ActiveRouteSmokeTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function representative_active_product_routes_resolve_without_server_errors()
     {
         Queue::fake();

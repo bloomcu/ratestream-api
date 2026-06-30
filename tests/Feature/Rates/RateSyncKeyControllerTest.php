@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Rates;
 
+use PHPUnit\Framework\Attributes\Test;
 use DDD\Domain\Base\Users\User;
 use DDD\Domain\Organizations\Organization;
 use Illuminate\Support\Facades\DB;
@@ -9,7 +10,7 @@ use Tests\TestCase;
 
 class RateSyncKeyControllerTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function admin_get_creates_and_returns_a_rates_sync_key_when_missing()
     {
         [$organization, $admin] = $this->organizationWithUser('admin');
@@ -31,7 +32,7 @@ class RateSyncKeyControllerTest extends TestCase
         $this->assertNotSame($key, $rawStoredKey);
     }
 
-    /** @test */
+    #[Test]
     public function admin_get_returns_the_existing_rates_sync_key()
     {
         [$organization, $admin] = $this->organizationWithUser('admin', [
@@ -48,7 +49,7 @@ class RateSyncKeyControllerTest extends TestCase
         $this->assertSame('existing-sync-key', $organization->fresh()->rates_sync_key);
     }
 
-    /** @test */
+    #[Test]
     public function admin_can_rotate_the_rates_sync_key()
     {
         [$organization, $admin] = $this->organizationWithUser('admin', [
@@ -69,7 +70,7 @@ class RateSyncKeyControllerTest extends TestCase
         $this->assertSame($key, $organization->fresh()->rates_sync_key);
     }
 
-    /** @test */
+    #[Test]
     public function rotate_does_not_return_the_stale_sync_key()
     {
         [$organization, $admin] = $this->organizationWithUser('admin', [
@@ -84,7 +85,7 @@ class RateSyncKeyControllerTest extends TestCase
         $this->assertNotSame('existing-sync-key', $response->json('data.key'));
     }
 
-    /** @test */
+    #[Test]
     public function super_admin_can_manage_any_organizations_rates_sync_key()
     {
         [$organization] = $this->organizationWithUser('admin');
@@ -97,7 +98,7 @@ class RateSyncKeyControllerTest extends TestCase
             ->assertJsonPath('data.created', true);
     }
 
-    /** @test */
+    #[Test]
     public function non_admin_organization_user_cannot_manage_the_rates_sync_key()
     {
         [$organization, $editor] = $this->organizationWithUser('editor');
@@ -108,7 +109,7 @@ class RateSyncKeyControllerTest extends TestCase
         $response->assertForbidden();
     }
 
-    /** @test */
+    #[Test]
     public function user_without_a_role_cannot_manage_the_rates_sync_key()
     {
         [$organization, $userWithoutRole] = $this->organizationWithUser(null);
@@ -119,7 +120,7 @@ class RateSyncKeyControllerTest extends TestCase
         $response->assertForbidden();
     }
 
-    /** @test */
+    #[Test]
     public function admin_from_another_organization_cannot_manage_the_rates_sync_key()
     {
         [$organization] = $this->organizationWithUser('admin');
