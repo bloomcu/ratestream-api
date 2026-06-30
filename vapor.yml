@@ -3,7 +3,12 @@ name: ratestream-api
 ignore:
     - todo.txt
     - docker-compose.yml
-    
+    - .claude
+    - .mcp.json
+    - boost.json
+    - AGENTS.md
+    - TODO.md
+
 environments:
     production:
         memory: 1024

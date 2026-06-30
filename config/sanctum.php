@@ -60,8 +60,9 @@ return [
     */
 
     'middleware' => [
-        'verify_csrf_token' => DDD\Http\Middleware\VerifyCsrfToken::class,
-        'encrypt_cookies' => DDD\Http\Middleware\EncryptCookies::class,
+        'authenticate_session' => Laravel\Sanctum\Http\Middleware\AuthenticateSession::class,
+        'encrypt_cookies' => Illuminate\Cookie\Middleware\EncryptCookies::class,
+        'validate_csrf_token' => Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
     ],
 
 ];

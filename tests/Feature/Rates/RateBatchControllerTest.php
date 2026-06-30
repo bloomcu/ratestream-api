@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Rates;
 
+use PHPUnit\Framework\Attributes\Test;
 use DDD\App\Jobs\SyncPublishedRatesToWebsite;
 use DDD\Domain\Base\Users\User;
 use DDD\Domain\Organizations\Organization;
@@ -12,7 +13,7 @@ use Tests\TestCase;
 
 class RateBatchControllerTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_dispatches_the_website_sync_job_after_batch_updating_the_default_published_group()
     {
         Queue::fake();
@@ -43,7 +44,7 @@ class RateBatchControllerTest extends TestCase
         Queue::assertPushed(SyncPublishedRatesToWebsite::class, 1);
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_dispatch_the_website_sync_job_after_batch_updating_a_draft_revision()
     {
         Queue::fake();
@@ -78,7 +79,7 @@ class RateBatchControllerTest extends TestCase
         Queue::assertNotPushed(SyncPublishedRatesToWebsite::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_batch_updates_to_the_requested_revision_group_without_touching_the_published_group()
     {
         Queue::fake();
@@ -120,7 +121,7 @@ class RateBatchControllerTest extends TestCase
         Queue::assertNotPushed(SyncPublishedRatesToWebsite::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_only_the_requested_revision_group_after_batch_updating_a_revision()
     {
         Queue::fake();

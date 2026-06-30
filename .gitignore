@@ -15,5 +15,8 @@ yarn-error.log
 .env.staging
 .vapor
 todo.txt
-TODO.md
+
 docker-compose.yml
+
+# PHPUnit 10 result cache
+/.phpunit.cache
