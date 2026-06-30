@@ -17,3 +17,6 @@ yarn-error.log
 todo.txt
 
 docker-compose.yml
+
+# PHPUnit 10 result cache
+/.phpunit.cache
