@@ -98,7 +98,7 @@ class PublicRateEndpointsTest extends TestCase
         $response = $this->get("/api/{$organization->slug}/rates/export");
 
         $response->assertOk();
-        $response->assertHeader('content-type', 'text/csv; charset=UTF-8');
+        $response->assertHeader('content-type', 'text/csv; charset=utf-8');
         $response->assertHeader('content-disposition', "attachment; filename={$organization->slug}-rates.csv");
 
         $csv = $response->streamedContent();
